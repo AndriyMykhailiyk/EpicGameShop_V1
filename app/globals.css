@@ -1,26 +1,75 @@
-@import "tailwindcss";
+@reference "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-zinc-900 text-zinc-100;
+}
+
+a {
+  @apply text-blue-400 hover:text-blue-300 transition;
+}
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 20%;
+  min-width: 250px;
+  background: #1a1a1a;
+  border-right: 1px solid #333;
+  padding: 20px;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-area {
+  flex: 1;
+  padding: 20px;
+  background: #121212;
+}
+
+/* Стилі для HeroBanner */
+.hero-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 30px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.banner-title {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+/* Стилі для GameItem */
+.game-item {
+  background: #1e1e1e;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #0078f2;
+}
+
+.game-prices {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.discounted-price {
+  color: #4caf50;
+  font-weight: bold;
 }
