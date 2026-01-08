@@ -19,7 +19,13 @@ export default function RootLayout({
   return (
     <html lang="uk">
       <body className={inter.className} style={{ margin: 0, height: "100vh" }}>
-        <div style={{ display: "flex", height: "100%" }}>
+        <div
+          style={{
+            display: "flex",
+            height: "100%",
+            backgroundColor: "#131317",
+          }}
+        >
           <div style={{ flex: 1 }}>
             <Sidebar />
           </div>

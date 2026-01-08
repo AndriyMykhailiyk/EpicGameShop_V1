@@ -1,0 +1,201 @@
+.header {
+  padding: 35px 25px;
+}
+.leftDiv {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 15px;
+}
+.input {
+  background-color: #201f24;
+  font-size: 14px;
+  padding: 10px 15px;
+}
+.ulist {
+  gap: 15px;
+  display: flex;
+  font-size: 12px;
+  cursor: pointer;
+  color: aliceblue;
+}
+
+/* Header.module.css */
+
+/* Ваші існуючі стилі для header, leftDiv, rightDiv, і т.д. */
+
+.Input {
+  position: relative;
+  width: 250px; /* або така ж ширина, як у вашого інпута */
+}
+
+.input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #0070f3;
+  box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.1);
+}
+
+/* Випадаюче меню */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%; /* Така ж ширина, як у інпута */
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  margin-top: -1px; /* Щоб було без зазору між інпутом і меню */
+}
+
+.dropdownList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.dropdownItem {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+.gameLink {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease;
+}
+
+.gameLink:hover {
+  background-color: #f9fafb;
+}
+
+.gameInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gameImage {
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #f3f4f6;
+}
+
+.gameImage img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.gameDetails {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gameTitle {
+  font-weight: 500;
+  font-size: 14px;
+  color: #111827;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gamePrice {
+  font-size: 13px;
+  color: #059669;
+  font-weight: 600;
+}
+
+.originalPrice {
+  font-size: 11px;
+  color: #9ca3af;
+  text-decoration: line-through;
+  margin-left: 6px;
+}
+
+/* Стиль для інших елементів */
+.Litext {
+  /* ваші існуючі стилі */
+}
+
+.ulist {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ulist li a {
+  text-decoration: none;
+  color: whitesmoke;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+/* Анімація появи */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown {
+  animation: fadeIn 0.15s ease-out;
+}
+
+/* Для порожніх результатів */
+.noResults {
+  padding: 15px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Адаптація для мобільних пристроїв */
+@media (max-width: 768px) {
+  .Input {
+    width: 100%;
+  }
+
+  .dropdown {
+    position: fixed;
+    width: calc(100% - 32px);
+    left: 16px;
+    top: 60px;
+    max-height: 50vh;
+  }
+}
+
+/* Якщо у вас вже є стилі для header та інших елементів, додайте тільки нові */

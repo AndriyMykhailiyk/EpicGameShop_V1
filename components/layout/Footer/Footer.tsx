@@ -1,9 +1,11 @@
 // components/layout/Footer.tsx
+import styles from "./FooterCss/Footer.module.css";
+
 export default function Footer() {
   return (
-    <footer className="footer">
+    <footer className={styles.footer}>
       <div className="footer-container">
-        <div className="footer-links">
+        <div className={styles.footerSections}>
           <div className="footer-section">
             <h4>Магазин</h4>
             <ul>

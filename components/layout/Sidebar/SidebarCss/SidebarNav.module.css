@@ -1,0 +1,33 @@
+.sidebarLogo {
+  display: flex;
+  padding: 15px 0px;
+  justify-content: center;
+}
+.btnClick {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  cursor: pointer;
+  padding-left: 10px;
+}
+.btnClickText {
+  color: white;
+  font-size: 13px;
+}
+.btnClickIcon {
+  color: white;
+  font-size: 18px;
+}
+.btnClickwrap {
+  display: flex;
+  gap: 20px;
+
+  justify-content: space-between;
+  align-items: center;
+}
+
+li:hover {
+  background-color: rgba(137, 137, 137, 0.45);
+  border-radius: 5px;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
