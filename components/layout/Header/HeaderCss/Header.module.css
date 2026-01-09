@@ -199,3 +199,18 @@
 }
 
 /* Якщо у вас вже є стилі для header та інших елементів, додайте тільки нові */
+
+.main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 30px;
+}
+.icon {
+  cursor: pointer;
+}
+.rightDiv {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}

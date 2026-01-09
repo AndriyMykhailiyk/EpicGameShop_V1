@@ -3,12 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useDispatch } from "react-redux";
 import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
+import { addToCart } from "@/lib/store/cartSlice";
+import { showToast } from "@/components/ui/Toast";
 
 export default function GamePage() {
   const params = useParams();
   const gameId = params.game as string;
+  const dispatch = useDispatch();
 
   const allGames = getSaleGames();
   const game = allGames.find((g) => g.id === gameId);
@@ -23,6 +27,21 @@ export default function GamePage() {
       </div>
     );
   }
+
+  const handleAddToCart = () => {
+    dispatch(
+      addToCart({
+        id: game.id,
+        title: game.title,
+        imageUrl: game.imageUrl,
+        originalPrice: game.originalPrice,
+        discountedPrice: game.discountedPrice,
+        discount: game.discount,
+        description: game.description,
+      })
+    );
+    showToast(`"${game.title}" додано до кошика`);
+  };
 
   return (
     <div className="p-6">
@@ -110,8 +129,11 @@ export default function GamePage() {
               )}
             </div>
 
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors">
-              Додати до кошика
+            <button
+              onClick={handleAddToCart}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
+            >
+              Купити гру
             </button>
           </div>
 

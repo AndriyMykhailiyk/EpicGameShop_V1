@@ -1,0 +1,132 @@
+.container {
+  width: 81vw;
+  height: 70vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  display: flex;
+  width: 90%;
+  height: 90%;
+  gap: 24px;
+}
+
+.hero {
+  position: relative;
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  background-color: #1a1a20;
+}
+
+.heroImage {
+  object-fit: cover;
+  transition: transform 1s ease;
+}
+
+.heroOverlay {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  color: white;
+}
+
+.heroTitle {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.tags {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tag {
+  background-color: #2d2d33;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.priceSection {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.originalPrice {
+  text-decoration: line-through;
+  color: #6b7280;
+}
+
+.currentPrice {
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* Прогрес бар */
+.progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.progress {
+  height: 100%;
+  background-color: #3b82f6;
+  animation: progressAnimation 10s linear forwards;
+}
+
+@keyframes progressAnimation {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+/* Сайдбар */
+.sidebar {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: clip;
+}
+
+.sidebarItem {
+  display: flex;
+  gap: 8px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+  align-items: center;
+}
+
+.sidebarItem:hover {
+  opacity: 1;
+}
+
+.activeItem {
+  opacity: 1;
+  border-left: 4px solid #3b82f6;
+  padding-left: 4px;
+}
+
+.sidebarImage {
+  border-radius: 6px;
+}
+
+.sidebarTitle {
+  font-size: 12px;
+  color: white;
+}

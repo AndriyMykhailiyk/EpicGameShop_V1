@@ -1,4 +1,6 @@
 export interface Game {
+  price: any;
+  image: any;
   id: string;
   title: string;
   originalPrice: string; // "1,499,000 ₴"

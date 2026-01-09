@@ -5,6 +5,7 @@ import styles from "./HeaderCss/Header.module.css";
 import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,7 +66,7 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <main>
+      <main className={styles.main}>
         <div className={styles.leftDiv}>
           <div className={styles.Input} ref={searchRef}>
             <input
@@ -139,7 +140,26 @@ export default function Header() {
             </ul>
           </div>
         </div>
-        <div className={styles.rightDiv}></div>
+        <div className={styles.rightDiv}>
+          <Link href="/" aria-label="Перейти до кошика">
+            <Image
+              src="/save.png"
+              alt="User profile"
+              width={28}
+              height={28}
+              className={styles.icon}
+            />
+          </Link>
+          <Link href="/cart" aria-label="Перейти до кошика">
+            <Image
+              src="/icons8.png"
+              alt="User profile"
+              width={28}
+              height={28}
+              className={styles.icon}
+            />
+          </Link>
+        </div>
       </main>
     </header>
   );

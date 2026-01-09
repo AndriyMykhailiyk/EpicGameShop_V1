@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./SidebarCss/SidebarNav.module.css";
 
 import { useState } from "react";
@@ -23,16 +24,18 @@ export default function SidebarNav() {
       <ul>
         {sidebarNavItems.map((item: any) => (
           <li key={item.id}>
-            <button
-              className={styles.btnClick}
-              onClick={() => setActiveItem(item.id)}
-            >
-              <div className={styles.btnClickwrap}>
-                {" "}
-                <span className={styles.btnClickIcon}>{item.icon}</span>
-                <span className={styles.btnClickText}>{item.label}</span>
-              </div>
-            </button>
+            <Link href={item.href}>
+              <button
+                className={styles.btnClick}
+                onClick={() => setActiveItem(item.id)}
+              >
+                <div className={styles.btnClickwrap}>
+                  {" "}
+                  <span className={styles.btnClickIcon}>{item.icon}</span>
+                  <span className={styles.btnClickText}>{item.label}</span>
+                </div>
+              </button>
+            </Link>
           </li>
         ))}
       </ul>

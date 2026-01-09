@@ -1,0 +1,121 @@
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.buttonsContainer {
+  position: absolute;
+  top: -48px;
+  right: 0;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.scrollButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #262626;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollButton:hover {
+  background-color: #404040;
+}
+
+.carousel {
+  overflow: hidden;
+  width: 100%;
+  max-width: 79vw; /* максимум — ширина екрану */
+}
+
+.carouselTrack {
+  display: flex;
+  gap: 16px;
+}
+
+.gameItem {
+  flex: 0 0 calc(18.666% - 12px);
+  min-width: 0;
+  flex: 0 0 auto; /* ширина автоматично під контент */
+}
+
+.gameCard {
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.gameCard:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.gameImage {
+  object-fit: cover;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  display: block;
+}
+
+.gameInfo {
+  padding-top: 8px;
+}
+
+.gameLabel {
+  font-size: 12px;
+  color: #facc15;
+  margin: 0;
+}
+
+.gameTitle {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 4px 0;
+}
+
+.discountContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.discountBadge {
+  background-color: #3b82f6;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.priceContainer {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.originalPrice {
+  text-decoration: line-through;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.currentPrice {
+  font-size: 14px;
+  color: #ffffff;
+}
