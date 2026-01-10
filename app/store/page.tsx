@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { getSaleGames } from "@/lib/api/game";
 import styles from "./store.module.css";
-
+import { getSaleGames } from "@/lib/api/game";
+import { Game } from "@/types/game";
+import SaleGamesCarousel from "@/components/ui/carusel/SaleGamesCarousel";
 export default function StorePage() {
   const games = getSaleGames();
   const [activeIndex, setActiveIndex] = useState(0);
   const activeGame = games[activeIndex];
+  const saleGames: Game[] = getSaleGames();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -22,6 +24,7 @@ export default function StorePage() {
       <div className={styles.main}>
         {/* Велика картинка */}
         <div className={styles.hero}>
+          <h1>Великак картинка вішліст</h1>
           <Image
             src={activeGame.imageUrl}
             alt={activeGame.title}
@@ -60,6 +63,8 @@ export default function StorePage() {
 
         {/* Список ігор праворуч */}
         <div className={styles.sidebar}>
+          <h1>Великак картинка вішліст</h1>
+
           {games.map((game, idx) => (
             <div
               key={game.id}
@@ -80,6 +85,11 @@ export default function StorePage() {
           ))}
         </div>
       </div>
+      <br />
+      <div className={styles.saleGamesContainer}>
+        <SaleGamesCarousel games={saleGames} />
+      </div>
     </div>
   );
 }
+// <SaleGamesCarousel games={saleGames} />

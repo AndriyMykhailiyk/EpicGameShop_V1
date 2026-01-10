@@ -11,11 +11,18 @@ export default function CartPage() {
   const items = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
 
+  // ✅ Коректний парсер ціни
+  const parsePrice = (price: string) => {
+    const digitsOnly = price.replace(/[^\d]/g, "");
+    return Number(digitsOnly) / 100;
+  };
+
+  // ✅ Коректна загальна сума
   const totalPrice = items.reduce((sum, item) => {
-    const price = parseFloat(item.discountedPrice.replace("$", "")) || 0;
-    return sum + price;
+    return sum + parsePrice(item.discountedPrice);
   }, 0);
 
+  // ✅ Порожній кошик
   if (items.length === 0) {
     return (
       <>
@@ -32,9 +39,11 @@ export default function CartPage() {
     );
   }
 
+  // ✅ Кошик з товарами
   return (
     <>
       <h1 className={styles.title}>Мій Кошик</h1>
+
       <main className={styles.cartContainer}>
         <div className={styles.itemsList}>
           {items.map((item) => (
@@ -51,18 +60,22 @@ export default function CartPage() {
 
               <div className={styles.itemDetails}>
                 <h3 className={styles.itemTitle}>{item.title}</h3>
+
                 {item.description && (
                   <p className={styles.itemDescription}>{item.description}</p>
                 )}
+
                 <div className={styles.itemPrices}>
                   {item.originalPrice && (
                     <span className={styles.originalPrice}>
                       {item.originalPrice}
                     </span>
                   )}
+
                   <span className={styles.discountedPrice}>
                     {item.discountedPrice}
                   </span>
+
                   {item.discount && (
                     <span className={styles.discount}>-{item.discount}%</span>
                   )}
@@ -83,7 +96,7 @@ export default function CartPage() {
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Разом:</span>
             <span className={styles.summaryTotal}>
-              ${totalPrice.toFixed(2)}
+              {totalPrice.toFixed(2)} грн
             </span>
           </div>
 

@@ -4,6 +4,7 @@ import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import SaleGamesCarousel from "@/components/ui/carusel/SaleGamesCarousel";
 
+import BestOffer from "@/components/ui/grid/BestOffer";
 export default function Home() {
   const saleGames: Game[] = getSaleGames();
 
@@ -14,6 +15,8 @@ export default function Home() {
       </h1>
 
       <SaleGamesCarousel games={saleGames} />
+      <br />
+      <BestOffer />
     </div>
   );
 }
