@@ -177,24 +177,30 @@ export default function Header() {
         </div>
         <div className={styles.rightDiv}>
           <div className={styles.wraprightDiv}>
-            <Link href="/" aria-label="Перейти до кошика">
-              <Image
-                src="/save.png"
-                alt="User profile"
-                width={28}
-                height={28}
-                className={styles.icon}
-              />
-            </Link>
-            <Link href="/cart" aria-label="Перейти до кошика">
-              <Image
-                src="/icons8.png"
-                alt="User profile"
-                width={28}
-                height={28}
-                className={styles.icon}
-              />
-            </Link>
+            <div className={styles.iconWrapper}>
+              <Link href="/saved" aria-label="Перейти до кошика">
+                <Image
+                  src="/save.png"
+                  alt="User profile"
+                  width={28}
+                  height={28}
+                  className={styles.icon}
+                />
+              </Link>
+              <span className={styles.iconTooltip}>Збережені ігри</span>
+            </div>
+            <div className={styles.iconWrapper}>
+              <Link href="/cart" aria-label="Перейти до кошика">
+                <Image
+                  src="/icons8.png"
+                  alt="User profile"
+                  width={28}
+                  height={28}
+                  className={styles.icon}
+                />
+              </Link>
+              <span className={styles.iconTooltip}>Кошик</span>
+            </div>
           </div>
           <div className={styles.userProfile}>
             <div className={styles.userProfile} ref={profileRef}>

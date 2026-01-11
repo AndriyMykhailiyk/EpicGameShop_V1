@@ -100,7 +100,9 @@ export default function CartPage() {
             </span>
           </div>
 
-          <button className={styles.checkoutButton}>Оформити покупку</button>
+          <Link href="/checkout" className={styles.checkoutButton}>
+            Оформити покупку
+          </Link>
 
           <button
             onClick={() => dispatch(clearCart())}

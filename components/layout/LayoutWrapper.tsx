@@ -12,8 +12,10 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
   const isAccountPage = pathname === "/account";
+  // Hide header/sidebar/footer for account and checkout routes
+  const isMinimalLayout = isAccountPage || pathname?.startsWith("/checkout");
 
-  if (isAccountPage) {
+  if (isMinimalLayout) {
     return <main className="main-content">{children}</main>;
   }
 
