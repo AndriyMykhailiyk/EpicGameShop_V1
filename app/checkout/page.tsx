@@ -12,6 +12,7 @@ export default function CheckoutPage() {
   const items = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = React.useState(true);
+  const [paymentMethod, setPaymentMethod] = React.useState("card");
 
   React.useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 5000);
@@ -82,42 +83,137 @@ export default function CheckoutPage() {
         <div className={styles.formColumn}>
           <h2 className={styles.sectionTitle}>Оформлення замовлення</h2>
 
-          <div className={styles.cardBox}>
-            <label className={styles.radioRow}>
-              <input type="radio" name="pay" defaultChecked />
-              <span>Кредитна або дебетова картка</span>
+          {/* Способи оплати */}
+          <div className={styles.paymentMethods}>
+            <div className={styles.methodsTitle}>Виберіть спосіб оплати</div>
+
+            <label className={styles.methodOption}>
+              <input
+                type="radio"
+                name="payment_method"
+                value="card"
+                checked={paymentMethod === "card"}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              <div className={styles.methodContent}>
+                <span className={styles.methodIcon}>💳</span>
+                <div className={styles.methodInfo}>
+                  <div className={styles.methodTitle}>
+                    Кредитна або дебетова картка
+                  </div>
+                  <div className={styles.methodDesc}>
+                    Visa, Mastercard, Maestro
+                  </div>
+                </div>
+              </div>
             </label>
 
-            <div className={styles.formField}>
-              <label>Номер картки</label>
-              <input type="text" placeholder="0000 0000 0000 0000" />
-            </div>
+            <label className={styles.methodOption}>
+              <input
+                type="radio"
+                name="payment_method"
+                value="paypal"
+                checked={paymentMethod === "paypal"}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              <div className={styles.methodContent}>
+                <span className={styles.methodIcon}>🅿️</span>
+                <div className={styles.methodInfo}>
+                  <div className={styles.methodTitle}>PayPal</div>
+                  <div className={styles.methodDesc}>
+                    Безпечна оплата через PayPal
+                  </div>
+                </div>
+              </div>
+            </label>
 
-            <div className={styles.formRow}>
-              <div className={styles.formFieldSmall}>
-                <label>Термін дії</label>
-                <input type="text" placeholder="MM/YY" />
+            <label className={styles.methodOption}>
+              <input
+                type="radio"
+                name="payment_method"
+                value="apple"
+                checked={paymentMethod === "apple"}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              <div className={styles.methodContent}>
+                <span className={styles.methodIcon}>🍎</span>
+                <div className={styles.methodInfo}>
+                  <div className={styles.methodTitle}>Apple Pay</div>
+                  <div className={styles.methodDesc}>
+                    Швидкий платіж через Apple Pay
+                  </div>
+                </div>
               </div>
-              <div className={styles.formFieldSmall}>
-                <label>CVV</label>
-                <input type="text" placeholder="CVV" />
-              </div>
-            </div>
+            </label>
 
-            <div className={styles.saveOption}>
-              <span className={styles.muted}>
-                Зберегти цей спосіб оплати для подальших придбань?
-              </span>
-              <div className={styles.yesno}>
-                <label>
-                  <input type="radio" name="save" /> Так
-                </label>
-                <label>
-                  <input type="radio" name="save" defaultChecked /> Ні
-                </label>
+            <label className={styles.methodOption}>
+              <input
+                type="radio"
+                name="payment_method"
+                value="google"
+                checked={paymentMethod === "google"}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              />
+              <div className={styles.methodContent}>
+                <span className={styles.methodIcon}>🔵</span>
+                <div className={styles.methodInfo}>
+                  <div className={styles.methodTitle}>Google Pay</div>
+                  <div className={styles.methodDesc}>
+                    Швидкий платіж через Google Pay
+                  </div>
+                </div>
               </div>
-            </div>
+            </label>
           </div>
+
+          {/* Форма для кредитної карти */}
+          {paymentMethod === "card" && (
+            <div className={styles.cardBox}>
+              <div className={styles.formField}>
+                <label>Номер картки</label>
+                <input
+                  type="text"
+                  placeholder="0000 0000 0000 0000"
+                  maxLength={19}
+                />
+              </div>
+
+              <div className={styles.formField}>
+                <label>Ім'я на картці</label>
+                <input type="text" placeholder="IVAN PETRENKO" />
+              </div>
+
+              <div className={styles.formRow}>
+                <div className={styles.formFieldSmall}>
+                  <label>Термін дії</label>
+                  <input type="text" placeholder="MM/YY" maxLength={5} />
+                </div>
+                <div className={styles.formFieldSmall}>
+                  <label>CVV</label>
+                  <input type="text" placeholder="123" maxLength={4} />
+                </div>
+              </div>
+
+              <div className={styles.saveOption}>
+                <label>
+                  <input type="checkbox" />
+                  <span>Зберегти цей спосіб оплати</span>
+                </label>
+              </div>
+            </div>
+          )}
+
+          {/* Інші способи оплати */}
+          {paymentMethod !== "card" && (
+            <div className={styles.cardBox}>
+              <div className={styles.otherPaymentInfo}>
+                <p>
+                  Натисніть "Розмістити замовлення" для переходу на платіжний
+                  сервіс
+                </p>
+              </div>
+            </div>
+          )}
 
           <div className={styles.helpText}>
             <p>
