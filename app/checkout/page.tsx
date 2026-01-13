@@ -7,12 +7,15 @@ import { useSelector, useDispatch } from "react-redux";
 import styles from "./page.module.css";
 import { RootState } from "@/lib/store/store";
 import { clearCart } from "@/lib/store/cartSlice";
+import { supabase } from "@/lib/supabase/client";
 
 export default function CheckoutPage() {
   const items = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = React.useState(true);
   const [paymentMethod, setPaymentMethod] = React.useState("card");
+  const [showReceipt, setShowReceipt] = React.useState(false);
+  const [orderNumber, setOrderNumber] = React.useState("");
 
   React.useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 5000);
@@ -31,7 +34,7 @@ export default function CheckoutPage() {
   const tax = +(subtotal * 0.2).toFixed(2);
   const total = +(subtotal + tax).toFixed(2);
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     // Зберегти придбані ігри в localStorage (purchasedGames)
     try {
       const raw = localStorage.getItem("purchasedGames") || "[]";
@@ -65,8 +68,9 @@ export default function CheckoutPage() {
     }
 
     // Очистити кошик і перейти в бібліотеку
-    dispatch(clearCart());
-    window.location.href = "/library";
+    setOrderNumber(generateOrderNumber());
+    setShowReceipt(true);
+    await saveOrderToDB();
   };
 
   if (isLoading) {
@@ -76,6 +80,60 @@ export default function CheckoutPage() {
       </div>
     );
   }
+
+  // Фейковий генератор ключа та номера замовлення
+
+  const generateOrderNumber = () =>
+    "ORD-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+  const generateGameKey = () =>
+    "XXXX-XXXX-XXXX-".replace(/X/g, () =>
+      Math.floor(Math.random() * 16)
+        .toString(16)
+        .toUpperCase()
+    ) + Math.random().toString(36).substring(2, 6).toUpperCase();
+
+  const saveOrderToDB = async () => {
+    const orderNumber = generateOrderNumber();
+
+    // 1. Створюємо замовлення
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .insert({
+        user_id: user.id,
+        order_number: orderNumber,
+        total: total,
+      })
+      .select()
+      .single();
+
+    if (orderError) {
+      console.error(orderError);
+      return;
+    }
+
+    // 2. Товари замовлення
+    const itemsToInsert = items.map((item) => ({
+      order_id: order.id,
+      game_id: item.id,
+      game_title: item.title,
+      price: item.price,
+      activation_key: generateGameKey(),
+    }));
+
+    const { error: itemsError } = await supabase
+      .from("order_items")
+      .insert(itemsToInsert);
+
+    if (itemsError) {
+      console.error(itemsError);
+      return;
+    }
+
+    // 3. Показуємо чек
+    setOrderNumber(orderNumber);
+    setShowReceipt(true);
+  };
 
   return (
     <div className={styles.container}>
@@ -273,6 +331,64 @@ export default function CheckoutPage() {
           </div>
         </aside>
       </div>
+      {showReceipt && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.receiptModal}>
+            {/* Header */}
+            <div className={styles.receiptHeader}>
+              <h2>Дякуємо за покупку!</h2>
+              <button
+                className={styles.closeModal}
+                onClick={() => {
+                  dispatch(clearCart());
+                  setShowReceipt(false);
+                  window.location.href = "/";
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className={styles.receiptInfo}>
+              <p>
+                <strong>Номер замовлення:</strong> {orderNumber}
+              </p>
+              <p>
+                <strong>Дата:</strong> {new Date().toLocaleString()}
+              </p>
+            </div>
+
+            {/* Items */}
+            <div className={styles.receiptItems}>
+              {items.map((it, index) => (
+                <div key={it.id} className={styles.receiptItem}>
+                  <span>
+                    {index + 1}. {it.title}
+                  </span>
+                  <span>1 шт.</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Keys */}
+            <div className={styles.keysSection}>
+              <h3>Ключі активації</h3>
+              {items.map((it) => (
+                <div key={it.id} className={styles.keyRow}>
+                  <span>{it.title}</span>
+                  <code>{generateGameKey()}</code>
+                </div>
+              ))}
+            </div>
+
+            {/* Total */}
+            <div className={styles.receiptTotal}>
+              <span>Всього до сплати:</span>
+              <strong>{total.toFixed(2)} грн</strong>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

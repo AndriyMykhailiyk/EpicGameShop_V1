@@ -22,6 +22,7 @@ export default function LibraryPage() {
   const [genreFilter, setGenreFilter] = useState("");
   const [platformFilter, setPlatformFilter] = useState("");
   const [sortBy, setSortBy] = useState("date");
+  const [gameToRemove, setGameToRemove] = useState<PurchasedGame | null>(null);
 
   useEffect(() => {
     const raw = localStorage.getItem("purchasedGames") || "[]";
@@ -59,6 +60,11 @@ export default function LibraryPage() {
     const db = b.purchasedAt ? Date.parse(b.purchasedAt) : 0;
     return db - da;
   });
+  const removeGame = (id: string) => {
+    const updatedGames = games.filter((g) => g.id !== id);
+    setGames(updatedGames);
+    localStorage.setItem("purchasedGames", JSON.stringify(updatedGames));
+  };
 
   return (
     <div className={styles.container}>
@@ -131,10 +137,47 @@ export default function LibraryPage() {
                 </div>
                 <div className={styles.cardTitle}>{g.title}</div>
               </Link>
+
+              <button
+                className={styles.removeBtn}
+                onClick={() => setGameToRemove(g)}
+              >
+                Видалити
+              </button>
             </div>
           ))
         )}
       </div>
+      {gameToRemove && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <h3 className={styles.modalTitle}>Видалити гру з бібліотеки?</h3>
+
+            <p className={styles.modalText}>
+              «{gameToRemove.title}» буде видалено з вашої бібліотеки.
+            </p>
+
+            <div className={styles.modalActions}>
+              <button
+                className={styles.confirmBtn}
+                onClick={() => {
+                  removeGame(gameToRemove.id);
+                  setGameToRemove(null);
+                }}
+              >
+                Видалити
+              </button>
+
+              <button
+                className={styles.cancelBtn}
+                onClick={() => setGameToRemove(null)}
+              >
+                Скасувати
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

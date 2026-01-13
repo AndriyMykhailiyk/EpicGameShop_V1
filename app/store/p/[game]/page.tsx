@@ -79,6 +79,15 @@ export default function GamePage() {
     router.push("/saved");
   };
 
+  const purchasedIds =
+    typeof window !== "undefined"
+      ? (
+          JSON.parse(localStorage.getItem("purchasedGames") || "[]") as any[]
+        ).map((g) => g.id)
+      : [];
+
+  const isPurchased = (id: string) => purchasedIds.includes(id);
+
   return (
     <div className="p-6">
       <Link href="/" className="text-blue-500 hover:underline mb-6 block">
@@ -164,13 +173,21 @@ export default function GamePage() {
                 </span>
               )}
             </div>
-
-            <button
-              onClick={handleAddToCart}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
-            >
-              Купити гру
-            </button>
+            {isPurchased(game.id) ? (
+              <Link
+                href="/library"
+                className="w-full block text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors"
+              >
+                Перейти в бібліотеку
+              </Link>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
+              >
+                Купити гру
+              </button>
+            )}
           </div>
           <div style={{ width: "250px" }}>
             <button

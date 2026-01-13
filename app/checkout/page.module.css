@@ -365,3 +365,80 @@
     transform: rotate(360deg);
   }
 }
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.receiptModal {
+  background: #0f172a;
+  color: white;
+  width: 90%;
+  max-width: 800px;
+  border-radius: 16px;
+  padding: 32px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.receiptHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.closeModal {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.receiptInfo {
+  margin: 16px 0;
+  color: #cbd5f5;
+}
+
+.receiptItems {
+  border-top: 1px solid #334155;
+  border-bottom: 1px solid #334155;
+  padding: 16px 0;
+}
+
+.receiptItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.keysSection {
+  margin-top: 24px;
+}
+
+.keyRow {
+  display: flex;
+  justify-content: space-between;
+  background: #020617;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.keyRow code {
+  color: #22c55e;
+  font-family: monospace;
+}
+
+.receiptTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+  margin-top: 24px;
+  font-weight: bold;
+}

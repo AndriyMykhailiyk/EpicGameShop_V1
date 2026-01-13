@@ -59,8 +59,12 @@ export default function CartPage() {
               </div>
 
               <div className={styles.itemDetails}>
-                <h3 className={styles.itemTitle}>{item.title}</h3>
-
+                <Link
+                  href={`/store/p/${item.id}`}
+                  className={styles.itemTitleLink}
+                >
+                  <h3 className={styles.itemTitle}>{item.title}</h3>
+                </Link>
                 {item.description && (
                   <p className={styles.itemDescription}>{item.description}</p>
                 )}
