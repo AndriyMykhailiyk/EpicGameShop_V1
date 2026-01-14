@@ -21,14 +21,22 @@ export default function CheckoutPage() {
     const t = setTimeout(() => setIsLoading(false), 5000);
     return () => clearTimeout(t);
   }, []);
-
   const parsePrice = (price: string) => {
-    const digitsOnly = price.replace(/[^\d]/g, "");
-    return Number(digitsOnly) / 100;
+    if (!price) return 0;
+  
+    // прибираємо все, крім цифр і коми/крапки
+    const cleaned = price.replace(/[^\d.,]/g, "");
+  
+    // замінюємо кому на крапку
+    const normalized = cleaned.replace(",", ".");
+  
+    const result = parseFloat(normalized);
+    return isNaN(result) ? 0 : result;
   };
+  
 
   const subtotal = items.reduce(
-    (sum, item) => sum + parsePrice(item.discountedPrice),
+    (sum, item) => sum + parsePrice(item.discountedPrice) * item.quantity,
     0
   );
   const tax = +(subtotal * 0.2).toFixed(2);
@@ -305,7 +313,7 @@ export default function CheckoutPage() {
                 <div className={styles.summaryItemInfo}>
                   <div className={styles.summaryItemTitle}>{it.title}</div>
                   <div className={styles.summaryItemPrice}>
-                    {it.discountedPrice}
+                  {(parsePrice(it.discountedPrice) * it.quantity).toFixed(2)} грн
                   </div>
                 </div>
               </div>
@@ -360,25 +368,29 @@ export default function CheckoutPage() {
 
             {/* Items */}
             <div className={styles.receiptItems}>
-              {items.map((it, index) => (
-                <div key={it.id} className={styles.receiptItem}>
-                  <span>
-                    {index + 1}. {it.title}
-                  </span>
-                  <span>1 шт.</span>
-                </div>
-              ))}
-            </div>
+  {items.map((it, index) => (
+    <div key={it.id} className={styles.receiptItem}>
+      <span>
+        {index + 1}. {it.title}
+      </span>
+      <span>{it.quantity} шт.</span>
+    </div>
+  ))}
+</div>
+
 
             {/* Keys */}
             <div className={styles.keysSection}>
               <h3>Ключі активації</h3>
-              {items.map((it) => (
-                <div key={it.id} className={styles.keyRow}>
-                  <span>{it.title}</span>
-                  <code>{generateGameKey()}</code>
-                </div>
-              ))}
+       
+  {items.map(it =>
+    Array.from({ length: it.quantity }).map((_, i) => (
+      <div key={`${it.id}-${i}`} className={styles.keyRow}>
+        <span>{it.title}</span>
+        <code>{generateGameKey()}</code>
+      </div>
+    ))
+  )}
             </div>
 
             {/* Total */}

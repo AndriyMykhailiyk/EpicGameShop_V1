@@ -170,7 +170,9 @@ export default function Header() {
                 <a>Новинки</a>
               </li>
               <li>
-                <a>Увесь асортимент</a>
+              <li>
+  <Link href="/games">Увесь асортимент</Link>
+</li>
               </li>
             </ul>
           </div>

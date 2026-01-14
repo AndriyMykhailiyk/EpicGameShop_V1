@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import styles from "./page.module.css";
 import { RootState } from "@/lib/store/store";
-import { removeFromCart, clearCart } from "@/lib/store/cartSlice";
+import { removeFromCart, clearCart, increaseQuantity, decreaseQuantity } from "@/lib/store/cartSlice";
 
 export default function CartPage() {
   const items = useSelector((state: RootState) => state.cart.items);
@@ -19,7 +19,7 @@ export default function CartPage() {
 
   // ✅ Коректна загальна сума
   const totalPrice = items.reduce((sum, item) => {
-    return sum + parsePrice(item.discountedPrice);
+    return sum + parsePrice(item.discountedPrice) * item.quantity;
   }, 0);
 
   // ✅ Порожній кошик
@@ -85,7 +85,11 @@ export default function CartPage() {
                   )}
                 </div>
               </div>
-
+              <div className={styles.quantityControls}>
+  <button onClick={() => dispatch(decreaseQuantity(item.id))}>−</button>
+  <span>{item.quantity}</span>
+  <button onClick={() => dispatch(increaseQuantity(item.id))}>+</button>
+</div>
               <button
                 onClick={() => dispatch(removeFromCart(item.id))}
                 className={styles.removeButton}

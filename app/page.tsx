@@ -3,9 +3,10 @@ import Link from "next/link";
 import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import SaleGamesCarousel from "@/components/ui/carusel/SaleGamesCarousel";
-
 import BestOffer from "@/components/ui/grid/BestOffer";
+import { MegaSaleSection } from "@/components/MegaSale/MegaSaleSection";
 export default function Home() {
+
   const saleGames: Game[] = getSaleGames();
 
   return (
@@ -17,6 +18,8 @@ export default function Home() {
       <SaleGamesCarousel games={saleGames} />
       <br />
       <BestOffer />
+      <br /> 
+      <MegaSaleSection/>
     </div>
   );
 }
