@@ -46,7 +46,7 @@ export default function CheckoutPage() {
 
   const sendEmailReceipt = async (orderData: any) => {
     setIsSendingEmail(true);
-    
+
     try {
       const emailHTML = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -64,33 +64,53 @@ export default function CheckoutPage() {
               </tr>
             </thead>
             <tbody>
-              ${orderData.items.map((item: any) => `
+              ${orderData.items
+                .map(
+                  (item: any) => `
                 <tr>
-                  <td style="padding: 10px; border: 1px solid #ddd;">${item.title}</td>
-                  <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${item.quantity}</td>
-                  <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">${item.price.toFixed(2)} грн</td>
+                  <td style="padding: 10px; border: 1px solid #ddd;">${
+                    item.title
+                  }</td>
+                  <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${
+                    item.quantity
+                  }</td>
+                  <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">${item.price.toFixed(
+                    2
+                  )} грн</td>
                 </tr>
-              `).join('')}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
           
           <h3 style="margin-top: 20px;">Ключі активації:</h3>
-          ${orderData.keys.map((keyItem: any) => `
+          ${orderData.keys
+            .map(
+              (keyItem: any) => `
             <div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border-left: 3px solid #007bff;">
               <p style="margin: 5px 0;"><strong>${keyItem.title}</strong></p>
-              ${keyItem.keys.map((key: string) => `
+              ${keyItem.keys
+                .map(
+                  (key: string) => `
                 <p style="margin: 5px 0; font-family: monospace; background: white; padding: 5px; border: 1px solid #ddd;">
                   ${key}
                 </p>
-              `).join('')}
+              `
+                )
+                .join("")}
             </div>
-          `).join('')}
+          `
+            )
+            .join("")}
           
           <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px;">
             <p><strong>Підсумок:</strong></p>
             <p>Ціна: ${subtotal.toFixed(2)} грн</p>
             <p>ПДВ (20%): ${tax.toFixed(2)} грн</p>
-            <p style="font-size: 18px; color: #007bff;"><strong>Всього: ${total.toFixed(2)} грн</strong></p>
+            <p style="font-size: 18px; color: #007bff;"><strong>Всього: ${total.toFixed(
+              2
+            )} грн</strong></p>
           </div>
           
           <p style="margin-top: 20px; color: #666; font-size: 12px;">
@@ -99,10 +119,10 @@ export default function CheckoutPage() {
         </div>
       `;
 
-      const response = await fetch('/api/send-receipt', {
-        method: 'POST',
+      const response = await fetch("/api/send-receipt", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           to: email,
@@ -112,21 +132,20 @@ export default function CheckoutPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send email');
+        throw new Error("Failed to send email");
       }
 
-      alert('✅ Чек успішно відправлено на email!');
+      alert("✅ Чек успішно відправлено на email!");
     } catch (error) {
-      console.error('Email send error:', error);
-      alert('⚠️ Помилка відправки email, але ваші ключі збережені в чеку');
+      console.error("Email send error:", error);
     } finally {
       setIsSendingEmail(false);
     }
   };
 
   const handlePlaceOrder = async () => {
-    if (!email || !email.includes('@')) {
-      alert('⚠️ Будь ласка, введіть правильний email!');
+    if (!email || !email.includes("@")) {
+      alert("⚠️ Будь ласка, введіть правильний email!");
       return;
     }
 
@@ -165,7 +184,9 @@ export default function CheckoutPage() {
       const keys = items.map((item) => ({
         title: item.title,
         gameId: item.id,
-        keys: Array.from({ length: item.quantity }).map(() => generateGameKey())
+        keys: Array.from({ length: item.quantity }).map(() =>
+          generateGameKey()
+        ),
       }));
 
       const flatKeys = items.flatMap((item) =>
@@ -184,14 +205,13 @@ export default function CheckoutPage() {
       // Відправка email
       await sendEmailReceipt({
         orderNumber: orderNo,
-        items: items.map(it => ({
+        items: items.map((it) => ({
           title: it.title,
           quantity: it.quantity,
-          price: parsePrice(it.discountedPrice) * it.quantity
+          price: parsePrice(it.discountedPrice) * it.quantity,
         })),
         keys: keys,
       });
-
     } catch (error) {
       console.error("Error:", error);
       alert("❌ Сталася помилка при оформленні замовлення");
@@ -206,9 +226,16 @@ export default function CheckoutPage() {
           <h2 className={styles.sectionTitle}>Оформлення замовлення</h2>
 
           {/* Email поле */}
-          <div className={styles.cardBox} style={{ marginBottom: '20px' }}>
+          <div className={styles.cardBox} style={{ marginBottom: "20px" }}>
             <div className={styles.formField}>
-              <label htmlFor="email" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              <label
+                htmlFor="email"
+                style={{
+                  display: "block",
+                  marginBottom: "8px",
+                  fontWeight: "bold",
+                }}
+              >
                 Email для отримання ключів активації *
               </label>
               <input
@@ -220,15 +247,22 @@ export default function CheckoutPage() {
                 required
                 disabled={isLoading}
                 style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '5px',
-                  fontSize: '16px',
-                  boxSizing: 'border-box'
+                  width: "100%",
+                  padding: "12px",
+                  border: "1px solid #ddd",
+                  borderRadius: "5px",
+                  fontSize: "16px",
+                  boxSizing: "border-box",
                 }}
               />
-              <small style={{ color: '#666', fontSize: '12px', marginTop: '5px', display: 'block' }}>
+              <small
+                style={{
+                  color: "#666",
+                  fontSize: "12px",
+                  marginTop: "5px",
+                  display: "block",
+                }}
+              >
                 Ключі активації будуть відправлені на цей email
               </small>
             </div>
@@ -317,12 +351,14 @@ export default function CheckoutPage() {
           </div>
 
           <div className={styles.actionsRow}>
-            <button 
-              onClick={handlePlaceOrder} 
+            <button
+              onClick={handlePlaceOrder}
               className={styles.placeButton}
               disabled={isLoading || isSendingEmail}
             >
-              {isLoading || isSendingEmail ? "Обробка..." : "Розмістити замовлення"}
+              {isLoading || isSendingEmail
+                ? "Обробка..."
+                : "Розмістити замовлення"}
             </button>
             <Link href="/" className={styles.cancelLink}>
               Повернутися до магазину
@@ -345,7 +381,8 @@ export default function CheckoutPage() {
                 <div className={styles.summaryItemInfo}>
                   <div className={styles.summaryItemTitle}>{it.title}</div>
                   <div className={styles.summaryItemPrice}>
-                    {(parsePrice(it.discountedPrice) * it.quantity).toFixed(2)} грн
+                    {(parsePrice(it.discountedPrice) * it.quantity).toFixed(2)}{" "}
+                    грн
                   </div>
                 </div>
               </div>
@@ -395,7 +432,7 @@ export default function CheckoutPage() {
               <p>
                 <strong>Email:</strong> {email}
               </p>
-              <p style={{ color: '#28a745', marginTop: '10px' }}>
+              <p style={{ color: "#28a745", marginTop: "10px" }}>
                 ✅ Чек з ключами активації відправлено на ваш email!
               </p>
             </div>
