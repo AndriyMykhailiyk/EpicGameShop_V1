@@ -8,7 +8,6 @@ import styles from "./page.module.css";
 import { RootState } from "@/lib/store/store";
 import { clearCart } from "@/lib/store/cartSlice";
 import { supabase } from "@/lib/supabase/client";
-import { v4 as uuidv4 } from "uuid"; // для UUID локально, якщо потрібно
 
 export default function CheckoutPage() {
   const items = useSelector((state: RootState) => state.cart.items);
@@ -154,64 +153,56 @@ export default function CheckoutPage() {
     setIsLoading(true);
 
     try {
-      // Отримуємо сесію користувача
-      const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
-      if (sessionError) throw sessionError;
+      // Зберегти придбані ігри в localStorage
+      const raw = localStorage.getItem("purchasedGames") || "[]";
+      const existing = JSON.parse(raw);
+      const now = new Date().toISOString();
 
-      const user = sessionData?.session?.user;
+      const toAdd = items.map((it: any) => ({
+        id: it.id,
+        title: it.title,
+        image: it.imageUrl || it.image || "",
+        developer: it.developer || undefined,
+        publisher: it.publisher || undefined,
+        genres: it.genres || [],
+        platforms: it.platforms || [],
+        purchasedAt: now,
+      }));
 
-      if (!user) {
-        alert("⚠️ Користувач не авторизований, будь ласка, увійдіть в акаунт");
-        setIsLoading(false);
-        return;
-      }
+      const mergedMap: Record<string, any> = {};
+      existing.forEach((g: any) => {
+        mergedMap[g.id] = g;
+      });
+      toAdd.forEach((g) => {
+        mergedMap[g.id] = { ...(mergedMap[g.id] || {}), ...g };
+      });
 
-      // Генеруємо номер замовлення та ключі
+      const merged = Object.values(mergedMap);
+      localStorage.setItem("purchasedGames", JSON.stringify(merged));
+
+      // Генерація ключів
       const orderNo = generateOrderNumber();
+      const keys = items.map((item) => ({
+        title: item.title,
+        gameId: item.id,
+        keys: Array.from({ length: item.quantity }).map(() =>
+          generateGameKey()
+        ),
+      }));
 
       const flatKeys = items.flatMap((item) =>
         Array.from({ length: item.quantity }).map(() => ({
-          game_id: item.id.toString(),
+          game_id: item.id,
           game_title: item.title,
           activation_key: generateGameKey(),
-          price: parsePrice(item.discountedPrice),
         }))
       );
 
-      // 1️⃣ Створюємо замовлення
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          order_number: orderNo,
-          total: total,
-          user_id: user.id,
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      // 2️⃣ Створюємо order_items
-      const orderItems = flatKeys.map((k) => ({
-        id: uuidv4(),
-        order_id: order.id,
-        game_id: k.game_id,
-        game_title: k.game_title,
-        price: k.price,
-        activation_key: k.activation_key,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      // Зберігаємо ключі та номер замовлення для чеку
       setOrderNumber(orderNo);
-      setActivationKeys(orderItems);
+      setActivationKeys(flatKeys);
+
       setShowReceipt(true);
+      setIsLoading(false);
 
       // Відправка email
       await sendEmailReceipt({
@@ -221,22 +212,11 @@ export default function CheckoutPage() {
           quantity: it.quantity,
           price: parsePrice(it.discountedPrice) * it.quantity,
         })),
-        keys: orderItems.reduce((acc: any[], k) => {
-          const found = acc.find((a) => a.title === k.game_title);
-          if (found) {
-            found.keys.push(k.activation_key);
-          } else {
-            acc.push({ title: k.game_title, keys: [k.activation_key] });
-          }
-          return acc;
-        }, []),
+        keys: keys,
       });
-
-      dispatch(clearCart());
     } catch (error) {
-      console.error("Помилка оформлення замовлення:", error);
+      console.error("Error:", error);
       alert("❌ Сталася помилка при оформленні замовлення");
-    } finally {
       setIsLoading(false);
     }
   };
