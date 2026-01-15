@@ -8,6 +8,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { saveUser, clearUser } from "@/lib/auth/userStore";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 
 export default function Header() {
   const { data: session } = useSession();
@@ -18,6 +20,11 @@ export default function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  // Отримуємо кількість товарів у кошику з Redux
+  const cartItemsCount = useSelector((state: RootState) =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
 
   // Save user data to local storage when session changes
   useEffect(() => {
@@ -122,7 +129,7 @@ export default function Header() {
                   {filteredGames.map((game) => (
                     <li key={game.id} className={styles.dropdownItem}>
                       <Link
-                        href={`/games/${game.id}`}
+                        href={`/store/p/${game.id}`}
                         className={styles.gameLink}
                         onClick={handleGameSelect}
                       >
@@ -178,10 +185,10 @@ export default function Header() {
         <div className={styles.rightDiv}>
           <div className={styles.wraprightDiv}>
             <div className={styles.iconWrapper}>
-              <Link href="/saved" aria-label="Перейти до кошика">
+              <Link href="/saved" aria-label="Перейти до збережених">
                 <Image
                   src="/save.png"
-                  alt="User profile"
+                  alt="Saved games"
                   width={28}
                   height={28}
                   className={styles.icon}
@@ -190,14 +197,21 @@ export default function Header() {
               <span className={styles.iconTooltip}>Збережені ігри</span>
             </div>
             <div className={styles.iconWrapper}>
-              <Link href="/cart" aria-label="Перейти до кошика">
+              <Link
+                href="/cart"
+                aria-label="Перейти до кошика"
+                className={styles.cartIconWrapper}
+              >
                 <Image
                   src="/icons8.png"
-                  alt="User profile"
+                  alt="Cart"
                   width={28}
                   height={28}
                   className={styles.icon}
                 />
+                {cartItemsCount > 0 && (
+                  <span className={styles.cartBadge}>{cartItemsCount}</span>
+                )}
               </Link>
               <span className={styles.iconTooltip}>Кошик</span>
             </div>

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "../globals.css";
-import { StoreProvider } from "@/lib/store/StoreProvider";
-import { ToastContainer } from "@/components/ui/Toast";
+import { Providers } from "../providers";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
@@ -19,10 +18,7 @@ export default function AccountLayout({
   return (
     <html lang="uk">
       <body className={inter.className} style={{ margin: 0, padding: 0 }}>
-        <StoreProvider>
-          {children}
-          <ToastContainer />
-        </StoreProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -10,6 +10,7 @@ import { Game } from "@/types/game";
 import { addToCart } from "@/lib/store/cartSlice";
 import { showToast } from "@/components/ui/Toast";
 import System_requirements from "@/components/ui/cards/Systemrequirements";
+import GameRatingReviews from "@/components/GameRating/GameRatingReviews";
 export default function GamePage() {
   const params = useParams();
   const gameId = params.game as string;
@@ -225,6 +226,8 @@ export default function GamePage() {
           <p className="text-gray-300 leading-relaxed">{game.description}</p>
         </div>
       )}
+
+      <GameRatingReviews gameId={game.id} gameTitle={game.title} />
 
       {/* System requirements */}
       <System_requirements />

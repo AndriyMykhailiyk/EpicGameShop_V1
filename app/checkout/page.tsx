@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from "react-redux";
 import styles from "./page.module.css";
 import { RootState } from "@/lib/store/store";
 import { clearCart } from "@/lib/store/cartSlice";
-import { supabase } from "@/lib/supabase/client";
 
 export default function CheckoutPage() {
   const items = useSelector((state: RootState) => state.cart.items);
@@ -20,16 +19,92 @@ export default function CheckoutPage() {
   const [email, setEmail] = React.useState("");
   const [isSendingEmail, setIsSendingEmail] = React.useState(false);
 
-  const parsePrice = (price: string) => {
-    if (!price) return 0;
-    const cleaned = price.replace(/[^\d.,]/g, "");
-    const normalized = cleaned.replace(",", ".");
-    const result = parseFloat(normalized);
-    return isNaN(result) ? 0 : result;
+  // Діагностика - виведемо в консоль що приходить
+  React.useEffect(() => {
+    console.log("Cart items:", items);
+    items.forEach((item) => {
+      console.log(`Item: ${item.title}`);
+      console.log(
+        `  - discountedPrice:`,
+        item.discountedPrice,
+        typeof item.discountedPrice
+      );
+      console.log(`  - price:`, item.price);
+      console.log(`  - originalPrice:`, item.originalPrice);
+    });
+  }, [items]);
+
+  // Функція для отримання правильної ціни з товару
+  const getItemPrice = (item: any): number => {
+    // Спробуємо різні варіанти, де може бути ціна
+    const priceVariants = [
+      item.discountedPrice,
+      item.price?.current,
+      item.price,
+      item.originalPrice,
+      item.currentPrice,
+    ];
+
+    for (const variant of priceVariants) {
+      if (variant !== undefined && variant !== null) {
+        // Якщо це число - повертаємо його
+        if (typeof variant === "number") {
+          return variant;
+        }
+
+        // Якщо це рядок - парсимо
+        if (typeof variant === "string") {
+          // Видаляємо всі символи крім цифр та коми/крапки
+          let cleaned = variant.replace(/[^\d.,]/g, "");
+
+          // Визначаємо формат: "1,199,25" або "1,199.25" або "1199.25"
+          const commaCount = (cleaned.match(/,/g) || []).length;
+          const dotCount = (cleaned.match(/\./g) || []).length;
+
+          if (commaCount > 1) {
+            // Формат: "1,199,25" - коми як розділювачі тисяч, остання як десяткова
+            const lastCommaIndex = cleaned.lastIndexOf(",");
+            cleaned =
+              cleaned.substring(0, lastCommaIndex).replace(/,/g, "") +
+              "." +
+              cleaned.substring(lastCommaIndex + 1);
+          } else if (commaCount === 1 && dotCount === 0) {
+            // Формат: "1199,25" або "1,199"
+            const parts = cleaned.split(",");
+            if (parts[1] && parts[1].length <= 2) {
+              // Це десяткова кома: "1199,25" -> "1199.25"
+              cleaned = cleaned.replace(",", ".");
+            } else {
+              // Це розділювач тисяч: "1,199" -> "1199"
+              cleaned = cleaned.replace(",", "");
+            }
+          } else if (dotCount > 1) {
+            // Формат: "1.199.25" - крапки як розділювачі тисяч
+            const lastDotIndex = cleaned.lastIndexOf(".");
+            cleaned =
+              cleaned.substring(0, lastDotIndex).replace(/\./g, "") +
+              "." +
+              cleaned.substring(lastDotIndex + 1);
+          } else {
+            // Стандартний формат - просто замінюємо кому на крапку
+            cleaned = cleaned.replace(",", ".");
+          }
+
+          const parsed = parseFloat(cleaned);
+
+          if (!isNaN(parsed) && parsed > 0) {
+            return parsed;
+          }
+        }
+      }
+    }
+
+    console.warn(`Could not parse price for item:`, item);
+    return 0;
   };
 
   const subtotal = items.reduce(
-    (sum, item) => sum + parsePrice(item.discountedPrice) * item.quantity,
+    (sum, item) => sum + getItemPrice(item) * item.quantity,
     0
   );
   const tax = +(subtotal * 0.2).toFixed(2);
@@ -153,7 +228,6 @@ export default function CheckoutPage() {
     setIsLoading(true);
 
     try {
-      // Зберегти придбані ігри в localStorage
       const raw = localStorage.getItem("purchasedGames") || "[]";
       const existing = JSON.parse(raw);
       const now = new Date().toISOString();
@@ -180,7 +254,6 @@ export default function CheckoutPage() {
       const merged = Object.values(mergedMap);
       localStorage.setItem("purchasedGames", JSON.stringify(merged));
 
-      // Генерація ключів
       const orderNo = generateOrderNumber();
       const keys = items.map((item) => ({
         title: item.title,
@@ -201,16 +274,36 @@ export default function CheckoutPage() {
       setOrderNumber(orderNo);
       setActivationKeys(flatKeys);
 
+      const orderData = {
+        orderNumber: orderNo,
+        email: email,
+        total: total,
+        subtotal: subtotal,
+        tax: tax,
+        created_at: new Date().toISOString(),
+        items: items.map((item, idx) => ({
+          id: item.id,
+          game_title: item.title,
+          quantity: item.quantity,
+          price: getItemPrice(item) * item.quantity,
+          activation_key: flatKeys[idx]?.activation_key || generateGameKey(),
+        })),
+      };
+
+      const savedOrders = localStorage.getItem("userOrders");
+      const existingOrders = savedOrders ? JSON.parse(savedOrders) : [];
+      existingOrders.push(orderData);
+      localStorage.setItem("userOrders", JSON.stringify(existingOrders));
+
       setShowReceipt(true);
       setIsLoading(false);
 
-      // Відправка email
       await sendEmailReceipt({
         orderNumber: orderNo,
         items: items.map((it) => ({
           title: it.title,
           quantity: it.quantity,
-          price: parsePrice(it.discountedPrice) * it.quantity,
+          price: getItemPrice(it) * it.quantity,
         })),
         keys: keys,
       });
@@ -227,7 +320,6 @@ export default function CheckoutPage() {
         <div className={styles.formColumn}>
           <h2 className={styles.sectionTitle}>Оформлення замовлення</h2>
 
-          {/* Email поле */}
           <div className={styles.cardBox} style={{ marginBottom: "20px" }}>
             <div className={styles.formField}>
               <label
@@ -270,7 +362,6 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* Способи оплати */}
           <div className={styles.paymentMethods}>
             <div className={styles.methodsTitle}>Виберіть спосіб оплати</div>
 
@@ -315,7 +406,6 @@ export default function CheckoutPage() {
             </label>
           </div>
 
-          {/* Форма для кредитної карти */}
           {paymentMethod === "card" && (
             <div className={styles.cardBox}>
               <div className={styles.formField}>
@@ -383,8 +473,7 @@ export default function CheckoutPage() {
                 <div className={styles.summaryItemInfo}>
                   <div className={styles.summaryItemTitle}>{it.title}</div>
                   <div className={styles.summaryItemPrice}>
-                    {(parsePrice(it.discountedPrice) * it.quantity).toFixed(2)}{" "}
-                    грн
+                    {(getItemPrice(it) * it.quantity).toFixed(2)} грн
                   </div>
                 </div>
               </div>
