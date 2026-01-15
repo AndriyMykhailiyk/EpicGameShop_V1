@@ -74,7 +74,7 @@ export default function GamesPage() {
       <motion.div layout className="grid">
   <AnimatePresence>
     {filteredGames.map((game) => (
- <motion.div layout className={styles.grid}>
+ <motion.div layout key={game.id} className={styles.grid}>
  {filteredGames.map(game => (
    <motion.div key={game.id} layout className={styles.card}>
      <Link href={`/store/p/${game.id}`} className={styles.cardLink}>
