@@ -190,7 +190,7 @@ export default function GameRatingReviews({
     <div className="mt-12 border-t border-gray-700 pt-8">
       {/* Середній рейтинг */}
       <div className="mb-8 bg-gray-800 p-6 rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">Рейтинг гри</h2>
+        <h2 className="text-2xl font-bold mb-4">Рейтинг цієї гри</h2>
         <div className="flex items-center gap-6">
           <div className="text-center">
             <div className="text-5xl font-bold text-yellow-400">
