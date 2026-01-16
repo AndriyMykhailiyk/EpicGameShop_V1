@@ -1,6 +1,5 @@
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import bcryptjs from "bcryptjs";
@@ -10,10 +9,6 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
-    }),
-    GitHubProvider({
-      clientId: process.env.AUTH_GITHUB_ID!,
-      clientSecret: process.env.AUTH_GITHUB_SECRET!,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -76,5 +71,9 @@ export const authOptions: NextAuthOptions = {
   },
 
   secret: process.env.AUTH_SECRET,
+
+  // ⭐ КРИТИЧНО ДЛЯ VERCEL (NextAuth v4)!
+  useSecureCookies: process.env.NODE_ENV === "production",
+
   debug: process.env.NODE_ENV === "development",
 };
