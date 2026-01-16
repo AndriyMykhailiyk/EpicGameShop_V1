@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { supabase } from "@/lib/supabase/client";
 
 interface Review {
   id: string;
-  userId: string;
-  userName: string;
+  user_id: string;
+  user_name: string;
+  game_id: string;
   rating: number;
   comment: string;
-  date: string;
+  created_at: string;
 }
 
 interface GameRatingReviewsProps {
@@ -21,70 +23,70 @@ export default function GameRatingReviews({
   gameId,
   gameTitle,
 }: GameRatingReviewsProps) {
+  const { data: session, status } = useSession();
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Завантаження даних при монтуванні компонента
-  useEffect(() => {
-    // Перевірка авторизації
-    const checkAuth = () => {
-      const user = localStorage.getItem("currentUser");
-      const authToken = localStorage.getItem("authToken");
-      const userId = localStorage.getItem("userId");
-      const userName = localStorage.getItem("userName");
-
-      // Перевіряємо різні варіанти збереження користувача
-      if (user) {
-        try {
-          const userData = JSON.parse(user);
-          setIsAuthenticated(true);
-          setCurrentUser(userData);
-          return userData;
-        } catch (e) {
-          console.error("Помилка парсингу currentUser:", e);
-        }
-      } else if (authToken || (userId && userName)) {
-        // Якщо є токен або окремі дані користувача
-        const userData = {
-          id: userId || authToken || Date.now().toString(),
-          name: userName || "Користувач",
-        };
-        setIsAuthenticated(true);
-        setCurrentUser(userData);
-        return userData;
+  const isAuthenticated = status === "authenticated" && session?.user;
+  const currentUser = session?.user
+    ? {
+        id: session.user.id || session.user.email || "unknown",
+        name: session.user.name || session.user.email?.split("@")[0] || "Користувач",
       }
-      return null;
-    };
+    : null;
 
-    const userData = checkAuth();
-
-    // Завантаження всіх відгуків для гри
+  // Завантаження відгуків з бази даних
+  useEffect(() => {
     loadReviews();
-
-    // Завантаження рейтингу поточного користувача
-    if (userData) {
-      loadUserRating(userData);
-    }
   }, [gameId]);
 
-  const loadReviews = () => {
-    const allReviews = JSON.parse(localStorage.getItem("gameReviews") || "{}");
-    const gameReviews = allReviews[gameId] || [];
-    setReviews(gameReviews);
+  // Завантаження рейтингу користувача
+  useEffect(() => {
+    if (currentUser) {
+      loadUserRating();
+    }
+  }, [currentUser?.id, gameId]);
+
+  const loadReviews = async () => {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from("game_reviews")
+        .select("*")
+        .eq("game_id", gameId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      setReviews(data || []);
+    } catch (error) {
+      console.error("Помилка завантаження відгуків:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const loadUserRating = (userData: { id: string; name: string }) => {
-    const userRatings = JSON.parse(localStorage.getItem("userRatings") || "{}");
-    const savedRating = userRatings[`${userData.id}_${gameId}`];
-    if (savedRating) {
-      setUserRating(savedRating);
+  const loadUserRating = async () => {
+    if (!currentUser) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("game_reviews")
+        .select("rating, comment")
+        .eq("game_id", gameId)
+        .eq("user_id", currentUser.id)
+        .single();
+
+      if (data) {
+        setUserRating(data.rating);
+        setComment(data.comment || "");
+      }
+    } catch (error) {
+      // Відгук не знайдено - це нормально
     }
   };
 
@@ -93,17 +95,11 @@ export default function GameRatingReviews({
       alert("Увійдіть в акаунт, щоб поставити рейтинг");
       return;
     }
-
     setUserRating(rating);
-
-    // Зберігаємо рейтинг користувача
-    const userRatings = JSON.parse(localStorage.getItem("userRatings") || "{}");
-    userRatings[`${currentUser?.id}_${gameId}`] = rating;
-    localStorage.setItem("userRatings", JSON.stringify(userRatings));
   };
 
-  const handleSubmitReview = () => {
-    if (!isAuthenticated) {
+  const handleSubmitReview = async () => {
+    if (!isAuthenticated || !currentUser) {
       alert("Увійдіть в акаунт, щоб залишити відгук");
       return;
     }
@@ -118,43 +114,56 @@ export default function GameRatingReviews({
       return;
     }
 
-    const newReview: Review = {
-      id: Date.now().toString(),
-      userId: currentUser!.id,
-      userName: currentUser!.name,
-      rating: userRating,
-      comment: comment.trim(),
-      date: new Date().toLocaleDateString("uk-UA"),
-    };
+    setIsSubmitting(true);
 
-    // Зберігаємо відгук
-    const allReviews = JSON.parse(localStorage.getItem("gameReviews") || "{}");
-    if (!allReviews[gameId]) {
-      allReviews[gameId] = [];
+    try {
+      // Перевіряємо чи є вже відгук від цього користувача
+      const { data: existingReview } = await supabase
+        .from("game_reviews")
+        .select("id")
+        .eq("game_id", gameId)
+        .eq("user_id", currentUser.id)
+        .single();
+
+      if (existingReview) {
+        // Оновлюємо існуючий відгук
+        const { error } = await supabase
+          .from("game_reviews")
+          .update({
+            rating: userRating,
+            comment: comment.trim(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existingReview.id);
+
+        if (error) throw error;
+        alert("Відгук успішно оновлено!");
+      } else {
+        // Створюємо новий відгук
+        const { error } = await supabase.from("game_reviews").insert({
+          game_id: gameId,
+          user_id: currentUser.id,
+          user_name: currentUser.name,
+          rating: userRating,
+          comment: comment.trim(),
+        });
+
+        if (error) throw error;
+        alert("Відгук успішно збережено!");
+      }
+
+      // Перезавантажуємо відгуки
+      await loadReviews();
+    } catch (error) {
+      console.error("Помилка збереження відгуку:", error);
+      alert("Помилка при збереженні відгуку. Спробуйте ще раз.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Перевіряємо, чи користувач вже залишав відгук
-    const existingReviewIndex = allReviews[gameId].findIndex(
-      (review: Review) => review.userId === currentUser!.id
-    );
-
-    if (existingReviewIndex !== -1) {
-      // Оновлюємо існуючий відгук
-      allReviews[gameId][existingReviewIndex] = newReview;
-    } else {
-      // Додаємо новий відгук
-      allReviews[gameId].push(newReview);
-    }
-
-    localStorage.setItem("gameReviews", JSON.stringify(allReviews));
-
-    setComment("");
-    loadReviews();
-    alert("Відгук успішно збережено!");
   };
 
   const calculateAverageRating = () => {
-    if (reviews.length === 0) return 0;
+    if (reviews.length === 0) return "0.0";
     const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
     return (sum / reviews.length).toFixed(1);
   };
@@ -186,6 +195,18 @@ export default function GameRatingReviews({
     );
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("uk-UA");
+  };
+
+  if (status === "loading" || isLoading) {
+    return (
+      <div className="mt-12 border-t border-gray-700 pt-8">
+        <div className="text-center text-gray-400">Завантаження...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-12 border-t border-gray-700 pt-8">
       {/* Середній рейтинг */}
@@ -212,10 +233,21 @@ export default function GameRatingReviews({
 
         {!isAuthenticated ? (
           <div className="bg-yellow-900 border border-yellow-600 text-yellow-200 px-4 py-3 rounded mb-4">
-            ⚠️ Увійдіть в акаунт, щоб залишити відгук та оцінку
+            ⚠️{" "}
+            <a href="/account" className="underline hover:text-yellow-100">
+              Увійдіть в акаунт
+            </a>
+            , щоб залишити відгук та оцінку
           </div>
         ) : (
           <>
+            <div className="mb-4 text-sm text-gray-400">
+              Ви увійшли як:{" "}
+              <span className="text-white font-semibold">
+                {currentUser?.name}
+              </span>
+            </div>
+
             <div className="mb-6">
               <p className="text-gray-400 mb-3">Поставте оцінку від 1 до 10:</p>
               {renderStars(userRating, true)}
@@ -234,6 +266,7 @@ export default function GameRatingReviews({
                 placeholder="Поділіться своїми враженнями про гру..."
                 className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg border border-gray-600 focus:border-blue-500 focus:outline-none min-h-32 resize-vertical"
                 maxLength={1000}
+                disabled={isSubmitting}
               />
               <div className="text-right text-gray-500 text-sm mt-1">
                 {comment.length}/1000
@@ -242,9 +275,10 @@ export default function GameRatingReviews({
 
             <button
               onClick={handleSubmitReview}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+              disabled={isSubmitting}
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg transition-colors"
             >
-              Опублікувати відгук
+              {isSubmitting ? "Збереження..." : "Опублікувати відгук"}
             </button>
           </>
         )}
@@ -264,11 +298,13 @@ export default function GameRatingReviews({
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                      {review.userName.charAt(0).toUpperCase()}
+                      {review.user_name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <div className="font-bold">{review.userName}</div>
-                      <div className="text-gray-400 text-sm">{review.date}</div>
+                      <div className="font-bold">{review.user_name}</div>
+                      <div className="text-gray-400 text-sm">
+                        {formatDate(review.created_at)}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
