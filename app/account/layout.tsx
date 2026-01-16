@@ -15,11 +15,5 @@ export default function AccountLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="uk">
-      <body className={inter.className} style={{ margin: 0, padding: 0 }}>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  );
+  return <Providers>{children}</Providers>;
 }

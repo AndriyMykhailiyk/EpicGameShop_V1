@@ -1,23 +1,22 @@
-import NextAuth, { type Session } from "next-auth";
-import Google from "next-auth/providers/google";
-import GitHub from "next-auth/providers/github";
+import type { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { supabaseAdmin } from "./lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import bcryptjs from "bcryptjs";
-import type { JWT } from "next-auth/jwt";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    GoogleProvider({
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
-    GitHub({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    GitHubProvider({
+      clientId: process.env.AUTH_GITHUB_ID!,
+      clientSecret: process.env.AUTH_GITHUB_SECRET!,
     }),
     CredentialsProvider({
-      name: "Email & Password",
+      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
@@ -27,26 +26,31 @@ export const authOptions = {
           return null;
         }
 
-        const { data: user, error } = await supabaseAdmin
-          .from("users")
-          .select("id, email, password, name")
-          .eq("email", credentials.email)
-          .single();
+        try {
+          const { data: user, error } = await supabaseAdmin
+            .from("users")
+            .select("id, email, password, name")
+            .eq("email", credentials.email)
+            .single();
 
-        if (error || !user) return null;
+          if (error || !user) return null;
 
-        const isPasswordValid = await bcryptjs.compare(
-          credentials.password,
-          user.password
-        );
+          const isPasswordValid = await bcryptjs.compare(
+            credentials.password.toString(),
+            user.password
+          );
 
-        if (!isPasswordValid) return null;
+          if (!isPasswordValid) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
+          return null;
+        }
       },
     }),
   ],
@@ -56,20 +60,21 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: { id: string } }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
 
-    async session({ session, token }: { session: Session; token: JWT }) {
-      if (session.user) {
+    async session({ session, token }) {
+      if (session.user && token.id) {
         session.user.id = token.id as string;
       }
       return session;
     },
   },
-};
 
-export const { handlers, signIn, signOut, auth } = NextAuth(authOptions);
+  secret: process.env.AUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
+};
