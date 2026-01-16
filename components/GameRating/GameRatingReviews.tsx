@@ -156,7 +156,7 @@ export default function GameRatingReviews({
   const calculateAverageRating = () => {
     if (reviews.length === 0) return 0;
     const sum = reviews.reduce((acc, review) => acc + review.rating, 0);
-    return (sum / reviews.length).toFixed(1);
+    return Number((sum / reviews.length).toFixed(1));
   };
 
   const renderStars = (rating: number, isInteractive: boolean = false) => {
@@ -201,7 +201,7 @@ export default function GameRatingReviews({
           <div>
             <div className="text-gray-400 mb-2">Відгуків: {reviews.length}</div>
             {reviews.length > 0 &&
-              renderStars(Math.round(parseFloat(calculateAverageRating())))}
+              renderStars(Math.round(calculateAverageRating()))}
           </div>
         </div>
       </div>

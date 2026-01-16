@@ -35,6 +35,7 @@ export default function GamePage() {
     dispatch(
       addToCart({
         id: game.id,
+        price: game.price,
         title: game.title,
         imageUrl: game.imageUrl,
         originalPrice: game.originalPrice,
