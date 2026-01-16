@@ -35,7 +35,10 @@ export default function GameRatingReviews({
   const currentUser = session?.user
     ? {
         id: session.user.id || session.user.email || "unknown",
-        name: session.user.name || session.user.email?.split("@")[0] || "Користувач",
+        name:
+          session.user.name ||
+          session.user.email?.split("@")[0] ||
+          "Користувач",
       }
     : null;
 

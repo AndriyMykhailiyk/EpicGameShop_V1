@@ -4,7 +4,8 @@ import GitHub from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { supabaseAdmin } from "./lib/supabase/server";
 import bcryptjs from "bcryptjs";
-
+import type { NextAuthOptions } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 export const authOptions = {
   providers: [
     Google({
@@ -42,7 +43,7 @@ export const authOptions = {
           // Verify password
           const isPasswordValid = await bcryptjs.compare(
             credentials.password,
-            user.password
+            user.password,
           );
 
           if (!isPasswordValid) {
@@ -67,15 +68,22 @@ export const authOptions = {
     signIn: "/account",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: { id: string } }) {
       if (user) {
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
+
+    async session({
+      session,
+      token,
+    }: {
+      session: any;
+      token: JWT & { id?: string };
+    }) {
+      if (session.user && token.id) {
+        session.user.id = token.id;
       }
       return session;
     },

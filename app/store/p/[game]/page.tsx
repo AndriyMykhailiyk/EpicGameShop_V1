@@ -35,13 +35,14 @@ export default function GamePage() {
     dispatch(
       addToCart({
         id: game.id,
+        price: game.price,
         title: game.title,
         imageUrl: game.imageUrl,
         originalPrice: game.originalPrice,
         discountedPrice: game.discountedPrice,
         discount: game.discount,
         description: game.description,
-      })
+      }),
     );
     showToast(`"${game.title}" додано до кошика`);
   };
