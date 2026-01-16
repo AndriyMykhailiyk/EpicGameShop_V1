@@ -5,17 +5,29 @@ import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import styles from "./page.module.css";
 import { RootState } from "@/lib/store/store";
-import { removeFromCart, clearCart } from "@/lib/store/cartSlice";
+import {
+  removeFromCart,
+  clearCart,
+  increaseQuantity,
+  decreaseQuantity,
+} from "@/lib/store/cartSlice";
 
 export default function CartPage() {
   const items = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
 
+  // ✅ Коректний парсер ціни
+  const parsePrice = (price: string) => {
+    const digitsOnly = price.replace(/[^\d]/g, "");
+    return Number(digitsOnly) / 100;
+  };
+
+  // ✅ Коректна загальна сума
   const totalPrice = items.reduce((sum, item) => {
-    const price = parseFloat(item.discountedPrice.replace("$", "")) || 0;
-    return sum + price;
+    return sum + parsePrice(item.discountedPrice) * item.quantity;
   }, 0);
 
+  // ✅ Порожній кошик
   if (items.length === 0) {
     return (
       <>
@@ -32,9 +44,11 @@ export default function CartPage() {
     );
   }
 
+  // ✅ Кошик з товарами
   return (
     <>
       <h1 className={styles.title}>Мій Кошик</h1>
+
       <main className={styles.cartContainer}>
         <div className={styles.itemsList}>
           {items.map((item) => (
@@ -50,25 +64,41 @@ export default function CartPage() {
               </div>
 
               <div className={styles.itemDetails}>
-                <h3 className={styles.itemTitle}>{item.title}</h3>
+                <Link
+                  href={`/store/p/${item.id}`}
+                  className={styles.itemTitleLink}
+                >
+                  <h3 className={styles.itemTitle}>{item.title}</h3>
+                </Link>
                 {item.description && (
                   <p className={styles.itemDescription}>{item.description}</p>
                 )}
+
                 <div className={styles.itemPrices}>
                   {item.originalPrice && (
                     <span className={styles.originalPrice}>
                       {item.originalPrice}
                     </span>
                   )}
+
                   <span className={styles.discountedPrice}>
                     {item.discountedPrice}
                   </span>
+
                   {item.discount && (
                     <span className={styles.discount}>-{item.discount}%</span>
                   )}
                 </div>
               </div>
-
+              <div className={styles.quantityControls}>
+                <button onClick={() => dispatch(decreaseQuantity(item.id))}>
+                  −
+                </button>
+                <span>{item.quantity}</span>
+                <button onClick={() => dispatch(increaseQuantity(item.id))}>
+                  +
+                </button>
+              </div>
               <button
                 onClick={() => dispatch(removeFromCart(item.id))}
                 className={styles.removeButton}
@@ -83,11 +113,13 @@ export default function CartPage() {
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Разом:</span>
             <span className={styles.summaryTotal}>
-              ${totalPrice.toFixed(2)}
+              {totalPrice.toFixed(2)} грн
             </span>
           </div>
 
-          <button className={styles.checkoutButton}>Оформити покупку</button>
+          <Link href="/checkout" className={styles.checkoutButton}>
+            Оформити покупку
+          </Link>
 
           <button
             onClick={() => dispatch(clearCart())}

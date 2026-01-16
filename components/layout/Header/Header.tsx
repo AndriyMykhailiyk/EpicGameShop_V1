@@ -6,13 +6,38 @@ import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import Link from "next/link";
 import Image from "next/image";
+import { useSession, signOut } from "next-auth/react";
+import { saveUser, clearUser } from "@/lib/auth/userStore";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store/store";
 
 export default function Header() {
+  const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredGames, setFilteredGames] = useState<Game[]>([]);
   const [allGames, setAllGames] = useState<Game[]>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Отримуємо кількість товарів у кошику з Redux
+  const cartItemsCount = useSelector((state: RootState) =>
+    state.cart.items.reduce((total, item) => total + item.quantity, 0)
+  );
+
+  // Save user data to local storage when session changes
+  useEffect(() => {
+    if (session?.user) {
+      saveUser({
+        id: session.user.id as string | undefined,
+        name: session.user.name || undefined,
+        email: session.user.email || undefined,
+      });
+    } else {
+      clearUser();
+    }
+  }, [session]);
 
   // Завантажуємо всі ігри при монтажі компонента
   useEffect(() => {
@@ -47,6 +72,13 @@ export default function Header() {
       ) {
         setIsDropdownVisible(false);
       }
+
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -63,6 +95,16 @@ export default function Header() {
     setSearchQuery("");
     setIsDropdownVisible(false);
   };
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/" });
+    clearUser();
+    setIsProfileOpen(false);
+  };
+
+  const avatarLetter = session?.user?.email
+    ? session.user.email.charAt(0).toUpperCase()
+    : "U";
 
   return (
     <header className={styles.header}>
@@ -87,7 +129,7 @@ export default function Header() {
                   {filteredGames.map((game) => (
                     <li key={game.id} className={styles.dropdownItem}>
                       <Link
-                        href={`/games/${game.id}`}
+                        href={`/store/p/${game.id}`}
                         className={styles.gameLink}
                         onClick={handleGameSelect}
                       >
@@ -135,30 +177,75 @@ export default function Header() {
                 <a>Новинки</a>
               </li>
               <li>
-                <a>Увесь асортимент</a>
+                <Link href="/games">Увесь асортимент</Link>
               </li>
             </ul>
           </div>
         </div>
         <div className={styles.rightDiv}>
-          <Link href="/" aria-label="Перейти до кошика">
-            <Image
-              src="/save.png"
-              alt="User profile"
-              width={28}
-              height={28}
-              className={styles.icon}
-            />
-          </Link>
-          <Link href="/cart" aria-label="Перейти до кошика">
-            <Image
-              src="/icons8.png"
-              alt="User profile"
-              width={28}
-              height={28}
-              className={styles.icon}
-            />
-          </Link>
+          <div className={styles.wraprightDiv}>
+            <div className={styles.iconWrapper}>
+              <Link href="/saved" aria-label="Перейти до збережених">
+                <Image
+                  src="/save.png"
+                  alt="Saved games"
+                  width={28}
+                  height={28}
+                  className={styles.icon}
+                />
+              </Link>
+              <span className={styles.iconTooltip}>Збережені ігри</span>
+            </div>
+            <div className={styles.iconWrapper}>
+              <Link
+                href="/cart"
+                aria-label="Перейти до кошика"
+                className={styles.cartIconWrapper}
+              >
+                <Image
+                  src="/icons8.png"
+                  alt="Cart"
+                  width={28}
+                  height={28}
+                  className={styles.icon}
+                />
+                {cartItemsCount > 0 && (
+                  <span className={styles.cartBadge}>{cartItemsCount}</span>
+                )}
+              </Link>
+              <span className={styles.iconTooltip}>Кошик</span>
+            </div>
+          </div>
+          <div className={styles.userProfile}>
+            <div className={styles.userProfile} ref={profileRef}>
+              {session?.user ? (
+                <div className={styles.avatarWrapper}>
+                  <button
+                    className={styles.avatarButton}
+                    onClick={() => setIsProfileOpen((s) => !s)}
+                    aria-label="User menu"
+                  >
+                    {avatarLetter}
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className={styles.avatarDropdown}>
+                      <button
+                        className={styles.dropdownItem}
+                        onClick={handleSignOut}
+                      >
+                        Вийти
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link href="/account" className={styles.loginBtn}>
+                  Вхід
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
       </main>
     </header>

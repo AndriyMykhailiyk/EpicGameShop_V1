@@ -2,18 +2,22 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { getSaleGames } from "@/lib/api/game";
+import Link from "next/link";
 import styles from "./store.module.css";
-
+import { getSaleGames } from "@/lib/api/game";
+import { Game } from "@/types/game";
+import SaleGamesCarousel from "@/components/ui/carusel/SaleGamesCarousel";
 export default function StorePage() {
   const games = getSaleGames();
   const [activeIndex, setActiveIndex] = useState(0);
   const activeGame = games[activeIndex];
+  const saleGames: Game[] = getSaleGames();
+  const topPlayed = games.slice(-4).reverse();
 
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % games.length);
-    }, 10000); // 10 секунд
+    }, 5000); // 10 секунд
     return () => clearInterval(interval);
   }, [games.length]);
 
@@ -22,6 +26,7 @@ export default function StorePage() {
       <div className={styles.main}>
         {/* Велика картинка */}
         <div className={styles.hero}>
+          <h1>Великак картинка вішліст</h1>
           <Image
             src={activeGame.imageUrl}
             alt={activeGame.title}
@@ -60,6 +65,8 @@ export default function StorePage() {
 
         {/* Список ігор праворуч */}
         <div className={styles.sidebar}>
+          <h1>Великак картинка вішліст</h1>
+
           {games.map((game, idx) => (
             <div
               key={game.id}
@@ -78,8 +85,44 @@ export default function StorePage() {
               <span className={styles.sidebarTitle}>{game.title}</span>
             </div>
           ))}
+
+          {/* (removed) topPlayed moved to page section */}
         </div>
       </div>
+      <br />
+      <div className={styles.saleGamesContainer}>
+        <SaleGamesCarousel games={saleGames} />
+      </div>
+      {/* Секція: Найбільше грають (на сторінці) */}
+
+      <section className={styles.topPlayedSection}>
+        <h2 className={styles.topPlayedSectionTitle}>Найбільше грають {">"}</h2>
+        <ul className={styles.topPlayedListPage}>
+          {topPlayed.map((g) => (
+            <li key={g.id} className={styles.topPlayedItemPage}>
+              <Link
+                href={`/store/p/${g.id}`}
+                className={styles.topPlayedLinkPage}
+              >
+                <Image
+                  src={g.imageUrl}
+                  alt={g.title}
+                  width={60}
+                  height={60}
+                  className={styles.topPlayedImagePage}
+                />
+                <div className={styles.topPlayedTextPage}>
+                  <span className={styles.topPlayedNamePage}>{g.title}</span>
+                  <span className={styles.topPlayedPricePage}>
+                    {g.discountedPrice}
+                  </span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
+// <SaleGamesCarousel games={saleGames} />

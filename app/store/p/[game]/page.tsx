@@ -3,16 +3,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import { addToCart } from "@/lib/store/cartSlice";
 import { showToast } from "@/components/ui/Toast";
-
+import System_requirements from "@/components/ui/cards/Systemrequirements";
+import GameRatingReviews from "@/components/GameRating/GameRatingReviews";
 export default function GamePage() {
   const params = useParams();
   const gameId = params.game as string;
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const allGames = getSaleGames();
   const game = allGames.find((g) => g.id === gameId);
@@ -42,6 +45,49 @@ export default function GamePage() {
     );
     showToast(`"${game.title}" додано до кошика`);
   };
+
+  const handleAddToWishlist = () => {
+    const savedGames = JSON.parse(localStorage.getItem("savedGames") || "[]");
+
+    // Перевіряємо, чи гра вже в списку бажаного
+    const gameExists = savedGames.some((g: any) => g.id === game.id);
+
+    if (!gameExists) {
+      savedGames.push({
+        id: game.id,
+        title: game.title,
+        image: game.imageUrl,
+        price: {
+          current: game.discountedPrice,
+          original: game.originalPrice,
+        },
+        developer: game.developer,
+        publisher: game.publisher,
+        releaseDate: game.releaseDate,
+        rating: game.rating,
+        platforms: game.platforms,
+        tags: game.tags,
+        description: game.description,
+        isEarlyAccess: game.isEarlyAccess,
+        isFree: game.isFree,
+      });
+      localStorage.setItem("savedGames", JSON.stringify(savedGames));
+      showToast(`"${game.title}" додано до списку бажаного`);
+    } else {
+      showToast(`"${game.title}" вже в списку бажаного`);
+    }
+
+    router.push("/saved");
+  };
+
+  const purchasedIds =
+    typeof window !== "undefined"
+      ? (
+          JSON.parse(localStorage.getItem("purchasedGames") || "[]") as any[]
+        ).map((g) => g.id)
+      : [];
+
+  const isPurchased = (id: string) => purchasedIds.includes(id);
 
   return (
     <div className="p-6">
@@ -128,12 +174,34 @@ export default function GamePage() {
                 </span>
               )}
             </div>
-
+            {isPurchased(game.id) ? (
+              <Link
+                href="/library"
+                className="w-full block text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors"
+              >
+                Перейти в бібліотеку
+              </Link>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
+              >
+                Купити гру
+              </button>
+            )}
+          </div>
+          <div style={{ width: "250px" }}>
             <button
-              onClick={handleAddToCart}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
+              onClick={handleAddToWishlist}
+              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-2 rounded-lg transition-colors w-full flex items-center justify-center gap-2 mt-4"
             >
-              Купити гру
+              <Image
+                src="/save.png"
+                alt="User profile"
+                width={20}
+                height={20}
+              />
+              Список бажаного
             </button>
           </div>
 
@@ -158,6 +226,11 @@ export default function GamePage() {
           <p className="text-gray-300 leading-relaxed">{game.description}</p>
         </div>
       )}
+
+      <GameRatingReviews gameId={game.id} gameTitle={game.title} />
+
+      {/* System requirements */}
+      <System_requirements />
     </div>
   );
 }

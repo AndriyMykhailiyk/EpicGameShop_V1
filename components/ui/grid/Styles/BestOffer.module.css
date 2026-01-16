@@ -1,0 +1,39 @@
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 25px;
+  place-items: center;
+}
+.image {
+  object-fit: cover;
+  border-radius: 16px;
+  height: revert-layer;
+}
+.blackInfo {
+  padding: 10px 0px 10px 0px;
+}
+.title {
+  font-size: 21px;
+  font-weight: 700;
+  margin: 0;
+}
+.priceBlock {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.oldPrice {
+  font-weight: 600;
+  font-size: 16px;
+  color: #888888;
+  text-decoration: line-through;
+  margin: 0;
+}
+.discount {
+  background-color: rgb(0, 166, 255);
+  padding: 1px 6px;
+  border: 1px solid rgb(0, 166, 255);
+  border-radius: 8px;
+  font-size: 14px;
+  color: black;
+}

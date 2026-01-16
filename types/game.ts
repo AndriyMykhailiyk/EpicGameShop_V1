@@ -16,6 +16,8 @@ export interface Game {
   platforms: string[]; // ["Windows", "Mac"]
   releaseDate?: string;
   description?: string;
+  isMegaSale?: boolean;
+  saleEndsAt?: string;
 }
 
 export interface SaleSection {

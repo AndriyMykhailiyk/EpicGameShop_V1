@@ -1,0 +1,66 @@
+.page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.orderCard {
+  background: #0f172a;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.header span {
+  display: block;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.total {
+  font-size: 18px;
+  font-weight: 600;
+  color: #38bdf8;
+}
+
+.items {
+  border-top: 1px solid #1e293b;
+  margin-top: 15px;
+  padding-top: 15px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.key {
+  font-family: monospace;
+  background: #020617;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin-top: 6px;
+  display: inline-block;
+  color: #22c55e;
+}
+
+.loader {
+  text-align: center;
+  margin-top: 100px;
+  font-size: 18px;
+}
