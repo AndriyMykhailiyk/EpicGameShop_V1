@@ -6,7 +6,8 @@ import { supabaseAdmin } from "./lib/supabase/server";
 import bcryptjs from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
-export const authOptions = {
+
+export const authOptions: NextAuthOptions = {
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -28,7 +29,6 @@ export const authOptions = {
         }
 
         try {
-          // Query Supabase for user by email
           const { data: user, error } = await supabaseAdmin
             .from("users")
             .select("id, email, password, name")
@@ -40,7 +40,6 @@ export const authOptions = {
             return null;
           }
 
-          // Verify password
           const isPasswordValid = await bcryptjs.compare(
             credentials.password,
             user.password,
@@ -51,7 +50,6 @@ export const authOptions = {
             return null;
           }
 
-          // Return user object
           return {
             id: user.id,
             email: user.email,
@@ -64,9 +62,14 @@ export const authOptions = {
       },
     }),
   ],
+
+  // ⚠️ КРИТИЧНО для Netlify:
+  secret: process.env.NEXTAUTH_SECRET,
+
   pages: {
     signIn: "/account",
   },
+
   callbacks: {
     async jwt({ token, user }: { token: JWT; user?: { id: string } }) {
       if (user) {
@@ -88,8 +91,11 @@ export const authOptions = {
       return session;
     },
   },
+
+  // ⚠️ Додайте для production:
+  debug: process.env.NODE_ENV === "development",
 };
 
-const handlers = NextAuth(authOptions as any);
+const handler = NextAuth(authOptions);
 
-export { handlers };
+export { handler as GET, handler as POST };
