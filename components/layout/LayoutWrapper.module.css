@@ -1,0 +1,26 @@
+.wrapper {
+  display: flex;
+  background-color: rgb(19, 19, 23);
+  min-height: 100vh;
+}
+
+.sidebar {
+  flex: 1;
+}
+
+.content {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ======= Мобільний адаптив ======= */
+@media (max-width: 768px) {
+  .wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    display: none;
+  }
+}

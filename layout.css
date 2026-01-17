@@ -1,0 +1,26 @@
+/* globals.css або app/layout.css */
+.layout-wrapper {
+  display: flex;
+  background-color: rgb(19, 19, 23);
+  min-height: 100vh;
+}
+
+.layout-sidebar {
+  flex: 1;
+}
+
+.layout-content {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .layout-wrapper {
+    flex-direction: column;
+  }
+
+  .layout-sidebar {
+    display: none !important;
+  }
+}

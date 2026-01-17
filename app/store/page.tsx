@@ -7,9 +7,11 @@ import styles from "./store.module.css";
 import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import SaleGamesCarousel from "@/components/ui/carusel/SaleGamesCarousel";
+
 export default function StorePage() {
   const games = getSaleGames();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const activeGame = games[activeIndex];
   const saleGames: Game[] = getSaleGames();
   const topPlayed = games.slice(-4).reverse();
@@ -17,16 +19,25 @@ export default function StorePage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % games.length);
-    }, 5000); // 10 секунд
+    }, 5000);
     return () => clearInterval(interval);
   }, [games.length]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 600);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div className={styles.container}>
       <div className={styles.main}>
         {/* Велика картинка */}
         <div className={styles.hero}>
-          <h1>Великак картинка вішліст</h1>
           <Image
             src={activeGame.imageUrl}
             alt={activeGame.title}
@@ -56,16 +67,15 @@ export default function StorePage() {
             </div>
           </div>
           <div className={styles.progressBar}>
-            <div
-              key={activeIndex} // щоб анімація скидалась
-              className={styles.progress}
-            ></div>
+            <div key={activeIndex} className={styles.progress}></div>
           </div>
         </div>
 
-        {/* Список ігор праворуч */}
+        {/* Список ігор - справа на десктопі, знизу на мобілках */}
         <div className={styles.sidebar}>
-          <h1>Великак картинка вішліст</h1>
+          {isMobile && (
+            <h2 className={styles.sidebarMobileTitle}>Всі ігри в списку</h2>
+          )}
 
           {games.map((game, idx) => (
             <div
@@ -78,23 +88,23 @@ export default function StorePage() {
               <Image
                 src={game.imageUrl}
                 alt={game.title}
-                width={60}
-                height={80}
+                width={isMobile ? 120 : 60}
+                height={isMobile ? 160 : 80}
                 className={styles.sidebarImage}
               />
               <span className={styles.sidebarTitle}>{game.title}</span>
             </div>
           ))}
-
-          {/* (removed) topPlayed moved to page section */}
         </div>
       </div>
+
       <br />
+
       <div className={styles.saleGamesContainer}>
         <SaleGamesCarousel games={saleGames} />
       </div>
-      {/* Секція: Найбільше грають (на сторінці) */}
 
+      {/* Секція: Найбільше грають */}
       <section className={styles.topPlayedSection}>
         <h2 className={styles.topPlayedSectionTitle}>Найбільше грають {">"}</h2>
         <ul className={styles.topPlayedListPage}>
@@ -125,4 +135,3 @@ export default function StorePage() {
     </div>
   );
 }
-// <SaleGamesCarousel games={saleGames} />

@@ -2,19 +2,20 @@
   width: 81vw;
   justify-content: center;
   align-items: center;
-  overflow-y: auto; /* Додає вертикальну прокрутку */
+  overflow-y: auto;
 }
 
 .main {
   display: flex;
   width: 90%;
-  height: 70vh;
   gap: 24px;
+  align-items: stretch;
 }
 
 .hero {
   position: relative;
   flex: 1;
+  min-height: 480px;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -82,7 +83,7 @@
 .progress {
   height: 100%;
   background-color: #3b82f6;
-  animation: progressAnimation 10s linear forwards;
+  animation: progressAnimation 5s linear forwards;
 }
 
 @keyframes progressAnimation {
@@ -96,57 +97,56 @@
 
 /* Сайдбар */
 .sidebar {
-  width: 220px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: clip;
+  overflow-y: auto;
 }
 
-.topPlayed {
-  margin-top: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+.sidebarMobileTitle {
+  display: none;
+  margin-bottom: 16px;
+  font-size: 20px;
+  color: #fff;
+}
+
+.sidebarItem {
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+  align-items: center;
+  padding: 8px;
   border-radius: 8px;
 }
 
-.topPlayedTitle {
-  font-size: 14px;
-  color: #fff;
-  margin: 0 0 8px 0;
-  font-weight: 700;
+.sidebarItem:hover {
+  opacity: 0.9;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
-.topPlayedList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.activeItem {
+  opacity: 1;
+  border-left: 4px solid #3b82f6;
+  padding-left: 8px;
 }
 
-.topPlayedItem {
-  display: flex;
-  align-items: center;
-}
-
-.topPlayedLink {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  text-decoration: none;
-}
-
-.topPlayedImage {
+.sidebarImage {
   border-radius: 6px;
   object-fit: cover;
 }
 
-.topPlayedName {
-  font-size: 13px;
-  color: #ddd;
+.sidebarTitle {
+  font-size: 12px;
+  color: white;
+}
+
+.saleGamesContainer {
+  padding-right: 66px;
+  padding-top: 60px;
+  padding-bottom: 60px;
 }
 
 /* Page-level top played section */
@@ -206,32 +206,74 @@
   font-weight: 700;
 }
 
-.sidebarItem {
-  display: flex;
-  gap: 8px;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: all 0.3s ease;
-  align-items: center;
+/* 📱 MOBILE STYLES */
+@media (max-width: 600px) {
+  .main {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero {
+    width: 100%;
+    height: 420px;
+    min-height: 420px;
+  }
+
+  .sidebar {
+    width: 100%;
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .sidebarMobileTitle {
+    display: block;
+    grid-column: 1 / -1;
+  }
+
+  .sidebarItem {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px;
+  }
+
+  .sidebarTitle {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .activeItem {
+    border-left: none;
+    border-top: 4px solid #3b82f6;
+    padding-left: 12px;
+    padding-top: 12px;
+  }
+
+  .heroTitle {
+    font-size: 24px;
+  }
+
+  .heroOverlay {
+    bottom: 16px;
+    left: 16px;
+  }
+
+  .saleGamesContainer {
+    padding-right: 20px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .topPlayedSection {
+    width: 95%;
+  }
 }
 
-.activeItem {
-  opacity: 1;
-  border-left: 4px solid #3b82f6;
-  padding-left: 4px;
-}
-
-.sidebarImage {
-  border-radius: 6px;
-}
-
-.sidebarTitle {
-  font-size: 12px;
-  color: white;
-}
-
-.saleGamesContainer {
-  padding-right: 66px;
-  padding-top: 60px;
-  padding-bottom: 60px;
+/* 💻 TABLET & DESKTOP */
+@media (min-width: 601px) {
+  .sidebar {
+    width: 300px;
+  }
 }

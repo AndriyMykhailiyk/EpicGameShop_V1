@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
 
+import "../../../../EpicGame-Shop/gamestore/layout.css";
 export default function LayoutWrapper({
   children,
 }: {
@@ -12,7 +13,6 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
   const isAccountPage = pathname === "/account";
-  // Hide header/sidebar/footer for account and checkout routes
   const isMinimalLayout = isAccountPage || pathname?.startsWith("/checkout");
 
   if (isMinimalLayout) {
@@ -20,21 +20,14 @@ export default function LayoutWrapper({
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        backgroundColor: "#131317",
-      }}
-    >
-      <div style={{ flex: 1 }}>
+    <div className="layout-wrapper">
+      <aside className="layout-sidebar">
         <Sidebar />
-      </div>
+      </aside>
 
-      <div style={{ flex: 4, display: "flex", flexDirection: "column" }}>
+      <div className="layout-content">
         <Header />
-        <main className="main-content" style={{ flex: 1 }}>
-          {children}
-        </main>
+        <main className="main-content">{children}</main>
         <Footer />
       </div>
     </div>

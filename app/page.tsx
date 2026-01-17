@@ -10,20 +10,97 @@ export default function Home() {
   const saleGames: Game[] = getSaleGames();
 
   return (
-    <div className="p-3 sm:p-4 md:p-6">
-      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">
-        Найліпше у літньому розпродажі
-      </h1>
+    <div
+      style={{
+        width: "100%",
+        minHeight: "100vh",
+        padding: "12px",
+      }}
+    >
+      <style jsx>{`
+        @media (min-width: 375px) {
+          .container {
+            padding: 16px;
+          }
+          .title {
+            fontsize: 20px;
+            marginbottom: 16px;
+          }
+          .spacer {
+            height: 16px;
+          }
+        }
 
-      <SaleGamesCarousel games={saleGames} />
+        @media (min-width: 640px) {
+          .container {
+            padding: 20px;
+          }
+          .title {
+            fontsize: 24px;
+            marginbottom: 20px;
+          }
+          .spacer {
+            height: 20px;
+          }
+        }
 
-      <div className="h-4 sm:h-6" />
+        @media (min-width: 768px) {
+          .container {
+            padding: 24px;
+          }
+          .title {
+            fontsize: 28px;
+            marginbottom: 24px;
+          }
+          .spacer {
+            height: 24px;
+          }
+        }
 
-      <BestOffer />
+        @media (min-width: 1024px) {
+          .container {
+            padding: 32px;
+          }
+          .title {
+            fontsize: 32px;
+            marginbottom: 32px;
+          }
+          .spacer {
+            height: 32px;
+          }
+        }
+      `}</style>
 
-      <div className="h-4 sm:h-6" />
+      <div className="container">
+        <h1
+          className="title"
+          style={{
+            fontSize: "18px",
+            fontWeight: "bold",
+            marginBottom: "12px",
+          }}
+        >
+          Найліпше у літньому розпродажі
+        </h1>
 
-      <MegaSaleSection />
+        <div style={{ width: "100%", overflow: "hidden" }}>
+          <SaleGamesCarousel games={saleGames} />
+        </div>
+
+        <div className="spacer" style={{ height: "16px" }} />
+
+        <div style={{ width: "100%" }}>
+          <BestOffer />
+        </div>
+
+        <div className="spacer" style={{ height: "16px" }} />
+
+        <div style={{ width: "100%" }}>
+          <MegaSaleSection />
+        </div>
+
+        <div style={{ height: "24px" }} />
+      </div>
     </div>
   );
 }

@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin", "cyrillic"] });
 export const metadata: Metadata = {
   title: "Epic Games Store",
   description: "Офіційний магазин Epic Games",
+  viewport: { width: "device-width", initialScale: 1 },
 };
 
 export default function RootLayout({
