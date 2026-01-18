@@ -36,6 +36,9 @@ export default function Footer() {
               <li>
                 <a href="/privacy">Політика конфіденційності</a>
               </li>
+              <li>
+                <a href="/privacy">Нічого не змінив</a>
+              </li>
             </ul>
           </div>
 
