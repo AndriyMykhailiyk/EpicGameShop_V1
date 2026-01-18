@@ -11,6 +11,7 @@ import { addToCart } from "@/lib/store/cartSlice";
 import { showToast } from "@/components/ui/Toast";
 import System_requirements from "@/components/ui/cards/Systemrequirements";
 import GameRatingReviews from "@/components/GameRating/GameRatingReviews";
+import GameDescription from "@/components/ui/cartabout/AboutGame";
 export default function GamePage() {
   const params = useParams();
   const gameId = params.game as string;
@@ -219,15 +220,26 @@ export default function GamePage() {
           )}
         </div>
       </div>
-
-      {/* Опис */}
       {game.description && (
-        <div className="mt-12 border-t border-gray-700 pt-8">
-          <h2 className="text-2xl font-bold mb-4">Про гру</h2>
-          <p className="text-gray-300 leading-relaxed">{game.description}</p>
-        </div>
+        <GameDescription
+          description={game.description}
+          title={game.title}
+          developer={game.developer}
+          tags={game.tags}
+          platforms={game.platforms}
+          rating={4.5} // Тут можна передати реальний рейтинг з вашого API
+          estimatedPlayTime="25-40 годин" // Можна додати це поле до типу Game
+          multiplayer={game.tags?.some(
+            (tag) =>
+              tag.includes("кооператив") ||
+              tag.includes("мультиплеєр") ||
+              game.title.includes("Battlefield") ||
+              game.title.includes("Fortnite"),
+          )}
+          maxHeight="400px"
+          className="mt-8"
+        />
       )}
-
       <GameRatingReviews gameId={game.id} gameTitle={game.title} />
 
       {/* System requirements */}
