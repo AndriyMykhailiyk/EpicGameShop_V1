@@ -39,10 +39,27 @@ export default function Header() {
     }
   }, [session]);
 
-  // Завантажуємо всі ігри при монтажі компонента
   useEffect(() => {
-    const games = getSaleGames();
-    setAllGames(games);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/games/catalog");
+        if (!res.ok) {
+          throw new Error("catalog");
+        }
+        const data = await res.json();
+        if (!cancelled) {
+          setAllGames(data.games ?? []);
+        }
+      } catch {
+        if (!cancelled) {
+          setAllGames(getSaleGames());
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Фільтруємо ігри при зміні пошукового запиту
@@ -230,6 +247,15 @@ export default function Header() {
 
                   {isProfileOpen && (
                     <div className={styles.avatarDropdown}>
+                      {session.user.isAdmin && (
+                        <Link
+                          href="/admin"
+                          className={styles.dropdownItem}
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          Адмін-панель
+                        </Link>
+                      )}
                       <button
                         className={styles.dropdownItem}
                         onClick={handleSignOut}

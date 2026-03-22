@@ -1,13 +1,10 @@
-import Image from "next/image";
-import Link from "next/link";
-import { getSaleGames } from "@/lib/api/game";
-import { Game } from "@/types/game";
 import SaleGamesCarousel from "@/components/ui/carusel/SaleGamesCarousel";
 import BestOffer from "@/components/ui/grid/BestOffer";
 import { MegaSaleSection } from "@/components/MegaSale/MegaSaleSection";
+import { loadCatalogGames } from "@/lib/catalog/loadGames";
 
-export default function Home() {
-  const saleGames: Game[] = getSaleGames();
+export default async function Home() {
+  const saleGames = await loadCatalogGames();
 
   return (
     <div className="p-3 sm:p-4 md:p-6">
@@ -23,7 +20,7 @@ export default function Home() {
 
       <div className="h-4 sm:h-6" />
 
-      <MegaSaleSection />
+      <MegaSaleSection games={saleGames} />
     </div>
   );
 }

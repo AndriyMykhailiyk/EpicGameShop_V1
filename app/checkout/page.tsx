@@ -4,11 +4,13 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
+import { useSession } from "next-auth/react";
 import styles from "./page.module.css";
 import { RootState } from "@/lib/store/store";
 import { clearCart } from "@/lib/store/cartSlice";
 
 export default function CheckoutPage() {
+  const { data: session } = useSession();
   const items = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -18,21 +20,10 @@ export default function CheckoutPage() {
   const [activationKeys, setActivationKeys] = React.useState<any[]>([]);
   const [email, setEmail] = React.useState("");
   const [isSendingEmail, setIsSendingEmail] = React.useState(false);
-
-  // Діагностика - виведемо в консоль що приходить
-  React.useEffect(() => {
-    console.log("Cart items:", items);
-    items.forEach((item) => {
-      console.log(`Item: ${item.title}`);
-      console.log(
-        `  - discountedPrice:`,
-        item.discountedPrice,
-        typeof item.discountedPrice
-      );
-      console.log(`  - price:`, item.price);
-      console.log(`  - originalPrice:`, item.originalPrice);
-    });
-  }, [items]);
+  /** Set when POST /api/orders fails so the user knows admin analytics will not see the order. */
+  const [orderServerSaveMessage, setOrderServerSaveMessage] = React.useState<
+    string | null
+  >(null);
 
   // Функція для отримання правильної ціни з товару
   const getItemPrice = (item: any): number => {
@@ -99,7 +90,6 @@ export default function CheckoutPage() {
       }
     }
 
-    console.warn(`Could not parse price for item:`, item);
     return 0;
   };
 
@@ -212,8 +202,8 @@ export default function CheckoutPage() {
       }
 
       alert("✅ Чек успішно відправлено на email!");
-    } catch (error) {
-      console.error("Email send error:", error);
+    } catch {
+      /* email delivery optional */
     } finally {
       setIsSendingEmail(false);
     }
@@ -226,6 +216,7 @@ export default function CheckoutPage() {
     }
 
     setIsLoading(true);
+    setOrderServerSaveMessage(null);
 
     try {
       const raw = localStorage.getItem("purchasedGames") || "[]";
@@ -295,6 +286,52 @@ export default function CheckoutPage() {
       existingOrders.push(orderData);
       localStorage.setItem("userOrders", JSON.stringify(existingOrders));
 
+      try {
+        const persistBody = {
+          email,
+          userId: session?.user?.id ?? null,
+          status: "paid" as const,
+          subtotal,
+          tax,
+          total,
+          orderNumber: orderNo,
+          items: items.map((item) => {
+            const keysForGame = flatKeys.filter((k) => k.game_id === item.id);
+            return {
+              gameId: item.id,
+              gameTitle: item.title,
+              quantity: item.quantity,
+              unitPrice: getItemPrice(item),
+              lineTotal: getItemPrice(item) * item.quantity,
+              activationKey: keysForGame[0]?.activation_key,
+            };
+          }),
+        };
+        const persistRes = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(persistBody),
+        });
+        if (!persistRes.ok) {
+          let detail = persistRes.statusText;
+          try {
+            const errBody = (await persistRes.json()) as { error?: string };
+            if (errBody?.error) {
+              detail = errBody.error;
+            }
+          } catch {
+            /* ignore */
+          }
+          setOrderServerSaveMessage(
+            `Замовлення збережено лише на цьому пристрої. Сервер не прийняв запис (${detail}). Перевірте інтернет і .env (Supabase), або зверніться до підтримки.`,
+          );
+        }
+      } catch {
+        setOrderServerSaveMessage(
+          "Замовлення збережено лише на цьому пристрої: не вдалося зв’язатися з сервером. Адмін-аналітика не побачить це замовлення, поки запис у базу не пройде.",
+        );
+      }
+
       setShowReceipt(true);
       setIsLoading(false);
 
@@ -307,8 +344,7 @@ export default function CheckoutPage() {
         })),
         keys: keys,
       });
-    } catch (error) {
-      console.error("Error:", error);
+    } catch {
       alert("❌ Сталася помилка при оформленні замовлення");
       setIsLoading(false);
     }
@@ -512,6 +548,23 @@ export default function CheckoutPage() {
                 ✕
               </button>
             </div>
+
+            {orderServerSaveMessage && (
+              <div
+                role="alert"
+                style={{
+                  margin: "0 20px 12px",
+                  padding: "12px 14px",
+                  background: "#fff3cd",
+                  border: "1px solid #ffc107",
+                  borderRadius: "8px",
+                  color: "#856404",
+                  fontSize: "14px",
+                }}
+              >
+                {orderServerSaveMessage}
+              </div>
+            )}
 
             <div className={styles.receiptInfo}>
               <p>

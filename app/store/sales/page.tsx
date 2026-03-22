@@ -2,10 +2,10 @@ import HeroSection from "@/components/ui/sections/HeroSection";
 import GameGrid from "@/components/ui/grid/GameGrid";
 import FilterSidebar from "@/components/ui/filters/FilterSidebar";
 import WeeklyOffer from "@/components/ui/sections/WeeklyOffer";
-import { getSaleGames } from "@/lib/api/game";
+import { loadCatalogGames } from "@/lib/catalog/loadGames";
 
-export default function SalesPage() {
-  const games = getSaleGames(); // Мок дані
+export default async function SalesPage() {
+  const games = await loadCatalogGames();
 
   return (
     <div className="sales-page">

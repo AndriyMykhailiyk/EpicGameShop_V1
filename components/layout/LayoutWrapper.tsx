@@ -12,8 +12,25 @@ export default function LayoutWrapper({
 }) {
   const pathname = usePathname();
   const isAccountPage = pathname === "/account";
+  const isAdminRoute = pathname?.startsWith("/admin");
   // Hide header/sidebar/footer for account and checkout routes
   const isMinimalLayout = isAccountPage || pathname?.startsWith("/checkout");
+
+  // Admin panel: full viewport, not inside store sidebar/header/footer
+  if (isAdminRoute) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
 
   if (isMinimalLayout) {
     return <main className="main-content">{children}</main>;

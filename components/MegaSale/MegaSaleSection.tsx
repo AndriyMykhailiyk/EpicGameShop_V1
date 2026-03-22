@@ -1,12 +1,12 @@
 "use client";
 
-import { getSaleGames } from "../../lib/api//game";
+import type { Game } from "@/types/game";
 import { MegaSaleCard } from "./MegaSaleCard";
 
-export const MegaSaleSection = () => {
-  const megaSaleGames = getSaleGames().filter(
-    (game) => game.isMegaSale
-  );
+type Props = { games: Game[] };
+
+export const MegaSaleSection = ({ games }: Props) => {
+  const megaSaleGames = games.filter((game) => game.isMegaSale);
 
   return (
     <section className="space-y-4">

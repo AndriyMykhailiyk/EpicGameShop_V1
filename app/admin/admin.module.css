@@ -1,0 +1,230 @@
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  background: #0b0f14;
+  color: #e8eef5;
+}
+
+.sidebar {
+  border-right: 1px solid #1f2a36;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #7cb8ff;
+}
+
+.navLink {
+  display: block;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  color: #c9d6e5;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.navLink:hover {
+  background: #15202b;
+  color: #fff;
+}
+
+.navLinkActive {
+  background: #1c2f45;
+  color: #fff;
+}
+
+.main {
+  padding: 1.5rem 2rem;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.statCard {
+  background: #121a24;
+  border: 1px solid #1f2a36;
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+
+.statLabel {
+  font-size: 0.85rem;
+  color: #8fa3b8;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0.35rem;
+}
+
+.tableWrap {
+  margin-top: 1rem;
+  overflow: auto;
+  border: 1px solid #1f2a36;
+  border-radius: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #1f2a36;
+}
+
+.table th {
+  background: #121a24;
+  color: #9db4cc;
+  font-weight: 600;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 520px;
+  margin-top: 1rem;
+}
+
+.form label {
+  font-size: 0.85rem;
+  color: #9db4cc;
+}
+
+.form input,
+.form textarea {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #2a3a4d;
+  background: #0f141c;
+  color: #e8eef5;
+}
+
+.form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.btn {
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background: #2563eb;
+  color: #fff;
+}
+
+.btn:hover {
+  background: #1d4ed8;
+}
+
+.btnDanger {
+  background: #b91c1c;
+}
+
+.btnDanger:hover {
+  background: #991b1b;
+}
+
+.btnGhost {
+  background: transparent;
+  border: 1px solid #2a3a4d;
+  color: #e8eef5;
+}
+
+.muted {
+  color: #8fa3b8;
+  font-size: 0.9rem;
+}
+
+.loginPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 20%, #1a2740, #0b0f14);
+  padding: 1rem;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 400px;
+  background: #121a24;
+  border: 1px solid #1f2a36;
+  border-radius: 14px;
+  padding: 1.75rem;
+}
+
+.loginTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.chartBox {
+  margin-top: 1.5rem;
+  height: 320px;
+  background: #121a24;
+  border: 1px solid #1f2a36;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.chartBoxTall {
+  height: 360px;
+}
+
+.chartGrid2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 960px) {
+  .chartGrid2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.sectionTitle {
+  margin-top: 1.75rem;
+  margin-bottom: 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.deltaPositive {
+  color: #4ade80;
+  font-size: 0.9rem;
+}
+
+.deltaNegative {
+  color: #f87171;
+  font-size: 0.9rem;
+}
+
+.rowActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

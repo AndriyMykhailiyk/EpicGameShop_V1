@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
 import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import { addToCart } from "@/lib/store/cartSlice";
@@ -17,9 +18,41 @@ export default function GamePage() {
   const gameId = params.game as string;
   const dispatch = useDispatch();
   const router = useRouter();
+  const [catalog, setCatalog] = useState<Game[] | null>(null);
 
-  const allGames = getSaleGames();
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/games/catalog");
+        if (!res.ok) {
+          throw new Error("catalog");
+        }
+        const data = await res.json();
+        if (!cancelled) {
+          setCatalog((data.games ?? []) as Game[]);
+        }
+      } catch {
+        if (!cancelled) {
+          setCatalog(getSaleGames());
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const allGames = catalog ?? [];
   const game = allGames.find((g) => g.id === gameId);
+
+  if (catalog === null) {
+    return (
+      <div className="p-6">
+        <p className="text-gray-400">Завантаження…</p>
+      </div>
+    );
+  }
 
   if (!game) {
     return (

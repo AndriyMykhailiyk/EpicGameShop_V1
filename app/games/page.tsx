@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,8 +37,30 @@ const PRICE_FILTERS = [
 ];
 
 export default function GamesPage() {
-  const games = getSaleGames() as Game[];
+  const [games, setGames] = useState<Game[]>([]);
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/games/catalog");
+        if (!res.ok) {
+          throw new Error("catalog");
+        }
+        const data = await res.json();
+        if (!cancelled) {
+          setGames((data.games ?? []) as Game[]);
+        }
+      } catch {
+        if (!cancelled) {
+          setGames(getSaleGames() as Game[]);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const allPlatforms = Array.from(
     new Set(games.flatMap((g) => g.platforms || []))

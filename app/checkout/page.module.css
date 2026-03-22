@@ -1,4 +1,5 @@
-:root {
+/* Custom properties on the page root class — :root is invalid in CSS Modules */
+.container {
   --bg: #f6f6f6;
   --primary: #3b82f6;
   --primary-dark: #2563eb;
@@ -6,9 +7,7 @@
   --text-light: #4b5563;
   --border: #e5e7eb;
   --bg-light: #f9fafb;
-}
 
-.container {
   width: 100%;
   padding: 24px 0 60px;
   background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);

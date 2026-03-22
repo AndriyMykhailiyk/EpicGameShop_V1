@@ -3,10 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true});\"",
+    "dev": "next dev --webpack",
+    "dev:turbo": "next dev --turbopack",
     "build": "next build",
+    "build:webpack": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "seed:admin": "tsx scripts/seed-admin.ts",
+    "seed:games": "tsx scripts/seed-games.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.1",
@@ -24,8 +30,10 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-redux": "^9.2.0",
+    "recharts": "^3.8.0",
     "redux-persist": "^6.0.0",
-    "resend": "^6.7.0"
+    "resend": "^6.7.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -36,6 +44,8 @@
     "eslint-config-next": "16.1.1",
     "prisma": "^6.19.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.21.0",
+    "typescript": "^5",
+    "vitest": "^2.1.9"
   }
 }

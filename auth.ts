@@ -6,6 +6,7 @@ import { supabaseAdmin } from "./lib/supabase/server";
 import bcryptjs from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
+import { logger } from "./lib/logger";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -31,12 +32,17 @@ export const authOptions: NextAuthOptions = {
         try {
           const { data: user, error } = await supabaseAdmin
             .from("users")
-            .select("id, email, password, name")
+            .select("id, email, password, name, is_admin, blocked")
             .eq("email", credentials.email)
             .single();
 
           if (error || !user) {
-            console.log("User not found:", credentials.email);
+            logger.debug("Credentials user lookup failed");
+            return null;
+          }
+
+          if (user.blocked === true) {
+            logger.warn("Blocked user sign-in attempt");
             return null;
           }
 
@@ -46,7 +52,7 @@ export const authOptions: NextAuthOptions = {
           );
 
           if (!isPasswordValid) {
-            console.log("Invalid password for user:", credentials.email);
+            logger.debug("Invalid credentials for email sign-in");
             return null;
           }
 
@@ -54,9 +60,12 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
             email: user.email,
             name: user.name,
+            isAdmin: user.is_admin === true,
           };
         } catch (error) {
-          console.error("Authorization error:", error);
+          logger.error("Authorization error", {
+            error: error instanceof Error ? error.message : String(error),
+          });
           return null;
         }
       },
@@ -71,24 +80,41 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: { id: string } }) {
-      if (user) {
-        token.id = user.id;
+    async jwt({
+      token,
+      user,
+    }: {
+      token: JWT & { id?: string; isAdmin?: boolean };
+      user?: { id: string; isAdmin?: boolean };
+    }) {
+      try {
+        if (user) {
+          token.id = user.id;
+          token.isAdmin = user.isAdmin === true;
+        }
+        return token;
+      } catch (err) {
+        logger.error("JWT callback error", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        return token;
       }
-      return token;
     },
 
-    async session({
-      session,
-      token,
-    }: {
-      session: any;
-      token: JWT & { id?: string };
-    }) {
-      if (session.user && token.id) {
-        session.user.id = token.id;
+    async session({ session, token }) {
+      try {
+        if (session.user && token.id) {
+          session.user.id = token.id as string;
+          session.user.isAdmin = (token as JWT & { isAdmin?: boolean })
+            .isAdmin === true;
+        }
+        return session;
+      } catch (err) {
+        logger.error("Session callback error", {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        return session;
       }
-      return session;
     },
   },
 
