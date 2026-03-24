@@ -114,9 +114,14 @@ export default function Header() {
   };
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" });
-    clearUser();
-    setIsProfileOpen(false);
+    try {
+      await signOut({ redirect: false });
+    } finally {
+      clearUser();
+      setIsProfileOpen(false);
+      /* Full navigation resets SessionProvider state so sidebar/header cannot stay “logged in”. */
+      window.location.assign("/");
+    }
   };
 
   const avatarLetter = session?.user?.email

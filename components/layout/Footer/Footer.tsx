@@ -1,68 +1,104 @@
-// components/layout/Footer.tsx
+import Link from "next/link";
 import styles from "./FooterCss/Footer.module.css";
 
+const storeLinks = [
+  { href: "/store", label: "Головна" },
+  { href: "/games", label: "Всі ігри" },
+  { href: "/store/sales", label: "Розпродажі" },
+  /* Окремої сторінки «безкоштовні» немає — ведемо в загальний каталог */
+  { href: "/games", label: "Безкоштовні ігри" },
+];
+
+const helpLinks = [
+  { href: "/support", label: "Підтримка" },
+  { href: "/terms", label: "Умови використання" },
+  { href: "/privacy", label: "Політика конфіденційності" },
+];
+
+const companyLinks = [
+  { href: "/about", label: "Про нас" },
+  { href: "/careers", label: "Кар'єра" },
+  { href: "/news", label: "Новини" },
+];
+
 export default function Footer() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className={styles.footer}>
-      <div className="footer-container">
-        <div className={styles.footerSections}>
-          <div className="footer-section">
-            <h4>Магазин</h4>
-            <ul>
-              <li>
-                <a href="/store">Головна</a>
-              </li>
-              <li>
-                <a href="/store/browse">Всі ігри</a>
-              </li>
-              <li>
-                <a href="/store/sales">Розпродажі</a>
-              </li>
-              <li>
-                <a href="/store/free">Безкоштовні ігри</a>
-              </li>
-            </ul>
+    <footer className={styles.footer} aria-label="Підвал сайту">
+      <div className={styles.inner}>
+        <div className={styles.grid}>
+          <div className={styles.brandCol}>
+            <span className={styles.brandName}>EpicGame Shop</span>
+            <p className={styles.tagline}>
+              Відкривайте нові світи: знижки, бібліотека та зручна покупка ігор в
+              одному місці.
+            </p>
           </div>
 
-          <div className="footer-section">
-            <h4>Довідка</h4>
-            <ul>
-              <li>
-                <a href="/support">Підтримка</a>
-              </li>
-              <li>
-                <a href="/terms">Умови використання</a>
-              </li>
-              <li>
-                <a href="/privacy">Політика конфіденційності</a>
-              </li>
-              <li>
-                <a href="/privacy">Нічого не змінив</a>
-              </li>
+          <nav aria-labelledby="footer-store-heading">
+            <h2 id="footer-store-heading" className={styles.sectionTitle}>
+              Магазин
+            </h2>
+            <ul className={styles.list}>
+              {storeLinks.map((item) => (
+                <li key={`${item.href}-${item.label}`}>
+                  <Link href={item.href} className={styles.link}>
+                    <span className={styles.linkChevron} aria-hidden>
+                      ›
+                    </span>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-          </div>
+          </nav>
 
-          <div className="footer-section">
-            <h4>Epic Games</h4>
-            <ul>
-              <li>
-                <a href="/about">Про нас</a>
-              </li>
-              <li>
-                <a href="/careers">Кар'єра</a>
-              </li>
-              <li>
-                <a href="/news">Новини</a>
-              </li>
+          <nav aria-labelledby="footer-help-heading">
+            <h2 id="footer-help-heading" className={styles.sectionTitle}>
+              Довідка
+            </h2>
+            <ul className={styles.list}>
+              {helpLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={styles.link}>
+                    <span className={styles.linkChevron} aria-hidden>
+                      ›
+                    </span>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
-          </div>
+          </nav>
+
+          <nav aria-labelledby="footer-company-heading">
+            <h2 id="footer-company-heading" className={styles.sectionTitle}>
+              Epic Games
+            </h2>
+            <ul className={styles.list}>
+              {companyLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className={styles.link}>
+                    <span className={styles.linkChevron} aria-hidden>
+                      ›
+                    </span>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
-        <div className="footer-bottom">
-          <p>
-            © {new Date().getFullYear()} Epic Games, Inc. Усі права захищені.
+        <div className={styles.divider} />
+
+        <div className={styles.bottom}>
+          <p className={styles.legal}>
+            © <span className={styles.year}>{year}</span> Epic Games, Inc. Усі
+            права захищені.
           </p>
-          <p>
+          <p className={styles.legalMuted}>
             Epic Games Store, логотип Epic Games та інші торгові марки є
             власністю Epic Games, Inc.
           </p>

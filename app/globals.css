@@ -16,12 +16,6 @@ a {
   min-height: 100vh;
 }
 
-.sidebar {
-  min-width: 250px;
-  background: #131317;
-  padding: 20px;
-}
-
 .main-content {
   flex: 1;
   display: flex;

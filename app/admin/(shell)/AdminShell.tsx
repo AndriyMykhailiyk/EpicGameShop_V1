@@ -43,7 +43,13 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             type="button"
             className={`${styles.btn} ${styles.btnGhost}`}
             style={{ width: "100%" }}
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={async () => {
+              try {
+                await signOut({ redirect: false });
+              } finally {
+                window.location.assign("/");
+              }
+            }}
           >
             Вийти
           </button>

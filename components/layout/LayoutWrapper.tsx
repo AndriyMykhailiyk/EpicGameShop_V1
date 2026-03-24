@@ -40,20 +40,33 @@ export default function LayoutWrapper({
     <div
       style={{
         display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
         backgroundColor: "#131317",
       }}
     >
-      <div style={{ flex: 1 }}>
-        <Sidebar />
+      {/* Ряд: сайдбар + основна колонка; футер нижче — на всю ширину вікна */}
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+        <div style={{ flex: 1, flexShrink: 0 }}>
+          <Sidebar />
+        </div>
+
+        <div
+          style={{
+            flex: 4,
+            display: "flex",
+            flexDirection: "column",
+            minWidth: 0,
+          }}
+        >
+          <Header />
+          <main className="main-content" style={{ flex: 1 }}>
+            {children}
+          </main>
+        </div>
       </div>
 
-      <div style={{ flex: 4, display: "flex", flexDirection: "column" }}>
-        <Header />
-        <main className="main-content" style={{ flex: 1 }}>
-          {children}
-        </main>
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 }
