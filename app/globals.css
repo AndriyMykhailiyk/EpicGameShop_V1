@@ -3,14 +3,25 @@
 @import "tailwindcss/preflight";
 @import "tailwindcss/utilities";
 
+:root {
+  --sidebar-width: 260px;
+  --header-height: 64px;
+  --mobile-header-height: 56px;
+  --z-sidebar-overlay: 900;
+  --z-sidebar: 950;
+  --z-header: 800;
+}
+
 html,
 body {
   @apply bg-zinc-900 text-zinc-100;
+  overflow-x: hidden;
 }
 
 a {
   @apply text-blue-400 hover:text-blue-300 transition;
 }
+
 .app-container {
   display: flex;
   min-height: 100vh;
@@ -20,40 +31,60 @@ a {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .content-area {
   flex: 1;
-  padding: 20px;
+  padding: 1rem;
   background: #131317;
 }
 
-/* Стилі для HeroBanner */
+@media (min-width: 768px) {
+  .content-area {
+    padding: 1.25rem;
+  }
+}
+
 .hero-banner {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 30px;
-  border-radius: 10px;
-  margin-bottom: 30px;
+  padding: 1.25rem;
+  border-radius: 0.625rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .hero-banner {
+    padding: 1.875rem;
+    margin-bottom: 1.875rem;
+  }
 }
 
 .banner-title {
-  font-size: 2rem;
-  margin-bottom: 10px;
+  font-size: clamp(1.25rem, 4vw, 2rem);
+  margin-bottom: 0.625rem;
 }
 
-/* Стилі для GameItem */
 .game-item {
   background: #131317;
-  padding: 20px;
-  margin-bottom: 15px;
-  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.5rem;
   border-left: 4px solid #0078f2;
+}
+
+@media (min-width: 768px) {
+  .game-item {
+    padding: 1.25rem;
+    margin-bottom: 0.9375rem;
+  }
 }
 
 .game-prices {
   display: flex;
-  gap: 20px;
-  margin-top: 10px;
+  gap: 0.75rem;
+  margin-top: 0.625rem;
+  flex-wrap: wrap;
 }
 
 .original-price {
@@ -64,4 +95,314 @@ a {
 .discounted-price {
   color: #4caf50;
   font-weight: bold;
+}
+
+/* Mobile sidebar overlay backdrop */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: var(--z-sidebar-overlay);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Body scroll lock when mobile sidebar is open */
+body.sidebar-open {
+  overflow: hidden;
+}
+
+/* Touch-friendly: minimum tap target 44x44 */
+@media (pointer: coarse) {
+  button,
+  a,
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Responsive images globally */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Responsive tables */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Site layout ─── */
+.admin-layout {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #131317;
+}
+
+.site-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Sidebar container: hidden off-screen on mobile, visible on desktop */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  z-index: var(--z-sidebar);
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.sidebar-container.open {
+  transform: translateX(0);
+}
+
+@media (min-width: 1024px) {
+  .sidebar-container {
+    position: relative;
+    transform: none;
+    flex-shrink: 0;
+  }
+
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
+
+.main-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+/* ─── Sales page layout ─── */
+.sales-page {
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .sales-page {
+    padding: 1.5rem;
+  }
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .content-wrapper {
+    flex-direction: row;
+  }
+}
+
+/* ─── Hero section (global) ─── */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding: 2rem;
+  }
+}
+
+.hero-content {
+  max-width: 100%;
+}
+
+.hero-title {
+  font-size: clamp(1.25rem, 4vw, 2rem);
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  opacity: 0.9;
+  margin: 0 0 0.75rem;
+}
+
+.hero-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ─── Filter sidebar (global) ─── */
+.filter-sidebar {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@media (min-width: 768px) {
+  .filter-sidebar {
+    width: 220px;
+    min-width: 200px;
+    flex-shrink: 0;
+  }
+}
+
+.filter-sidebar h3 {
+  margin: 0 0 1rem;
+  font-size: 1.125rem;
+}
+
+.filter-section {
+  margin-bottom: 1rem;
+}
+
+.filter-section h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+}
+
+.filter-section label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.filter-section input[type="range"] {
+  width: 100%;
+}
+
+/* ─── Game grid (global) ─── */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Game card (global) ─── */
+.game-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.game-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.game-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.game-card-content {
+  padding: 0.75rem;
+}
+
+.game-card-content .game-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-tags {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.game-tag {
+  background-color: #2d2d33;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+}
+
+/* ─── Weekly offer (global) ─── */
+.weekly-offer {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0.75rem;
+  margin-top: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.section-title {
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  margin: 0 0 0.75rem;
+}
+
+.offer-content p {
+  margin: 0 0 1rem;
+  color: #94a3b8;
+}
+
+.offer-button {
+  padding: 0.625rem 1.25rem;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  min-height: 44px;
+  transition: background 0.2s;
+}
+
+.offer-button:hover {
+  background: #2563eb;
 }

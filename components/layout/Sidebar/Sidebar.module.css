@@ -1,6 +1,5 @@
 .sidebar {
-  min-width: 260px;
-  max-width: 280px;
+  width: var(--sidebar-width, 260px);
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -12,6 +11,8 @@
     6px 0 40px rgba(0, 0, 0, 0.35);
   padding: 1.25rem 0.75rem 1.5rem;
   position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sidebar::before {
@@ -29,4 +30,34 @@
     rgba(139, 92, 246, 0.08)
   );
   pointer-events: none;
+}
+
+/* Close button only visible on mobile */
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+  z-index: 10;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+}
+
+@media (min-width: 1024px) {
+  .closeBtn {
+    display: none;
+  }
 }

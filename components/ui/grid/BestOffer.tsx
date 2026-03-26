@@ -40,7 +40,9 @@ export default function BestOffer() {
               alt={game.title}
               className={styles.image}
               width={450}
-              height={230}
+              height={253}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              loading="lazy"
             />
             <span className={styles.weekOffer}>Пропозиція тижня</span>
           </div>

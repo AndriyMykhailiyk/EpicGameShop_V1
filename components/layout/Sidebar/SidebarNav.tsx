@@ -33,17 +33,18 @@ export default function SidebarNav() {
 
   return (
     <nav className={styles.nav} aria-label="Розділи магазину">
-      <div className={styles.sidebarLogo}>
+      <Link href="/" className={styles.sidebarLogo} aria-label="На головну">
         <div className={styles.logoFrame}>
           <Image
             src="https://img.icons8.com/plasticine/100/epic-games.png"
             alt="Epic Games"
             width={52}
             height={52}
+            sizes="52px"
             priority
           />
         </div>
-      </div>
+      </Link>
 
       <ul className={styles.list}>
         {visibleItems.map((item) => {

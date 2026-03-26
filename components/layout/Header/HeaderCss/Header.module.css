@@ -1,41 +1,187 @@
+/* ─── Header: Mobile-first ─── */
 .header {
-  padding: 35px 25px;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header, 800);
+  background: rgba(19, 19, 23, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
+
+/* ─── Desktop header (hidden on mobile) ─── */
+.desktopMain {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .desktopMain {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+/* ─── Mobile header (hidden on desktop) ─── */
+.mobileMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 1rem;
+  gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .mobileMain {
+    display: none;
+  }
+}
+
+/* ─── Burger button ─── */
+.burgerBtn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.burgerLine {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-origin: center;
+}
+
+.burgerLineOpen1 {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.burgerLineOpen2 {
+  opacity: 0;
+}
+
+.burgerLineOpen3 {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ─── Mobile logo ─── */
+.mobileLogo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff !important;
+  text-decoration: none !important;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* ─── Mobile actions row ─── */
+.mobileActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobileSearchBtn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.mobileSearchBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mobileCartBtn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Mobile search bar ─── */
+.mobileSearchBar {
+  position: relative;
+  padding: 0 1rem 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .mobileSearchBar {
+    display: none;
+  }
+}
+
+.mobileSearchInput {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  background-color: #201f24;
+  color: #e2e8f0;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+}
+
+.mobileSearchInput:focus {
+  outline: none;
+  border-color: #0070f3;
+  box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.15);
+}
+
+.mobileDropdown {
+  position: absolute;
+  top: 100%;
+  left: 1rem;
+  right: 1rem;
+  background-color: #1a1a20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+/* ─── Desktop left section ─── */
 .leftDiv {
   display: flex;
   align-items: center;
-  gap: 30px;
-  padding: 15px;
+  gap: 1.5rem;
 }
-.input {
-  background-color: #201f24;
-  font-size: 14px;
-  padding: 10px 15px;
-}
-.ulist {
-  gap: 15px;
-  display: flex;
-  font-size: 12px;
-  cursor: pointer;
-  color: aliceblue;
-}
-
-/* Header.module.css */
-
-/* Ваші існуючі стилі для header, leftDiv, rightDiv, і т.д. */
 
 .Input {
   position: relative;
-  width: 250px; /* або така ж ширина, як у вашого інпута */
+  width: 250px;
 }
 
 .input {
   width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  font-size: 14px;
+  padding: 0.625rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.25rem;
+  font-size: 0.875rem;
   box-sizing: border-box;
+  background-color: #201f24;
+  color: #e2e8f0;
 }
 
 .input:focus {
@@ -44,19 +190,20 @@
   box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.1);
 }
 
-/* Випадаюче меню */
+/* ─── Dropdown (search results) ─── */
 .dropdown {
   position: absolute;
   top: 100%;
   left: 0;
-  width: 100%; /* Така ж ширина, як у інпута */
-  background-color: white;
-  border: 1px solid #e5e7eb;
+  width: 100%;
+  background-color: #1a1a20;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-top: none;
-  border-radius: 0 0 6px 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 0.375rem 0.375rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   z-index: 1000;
-  margin-top: -1px; /* Щоб було без зазору між інпутом і меню */
+  margin-top: -1px;
+  animation: fadeIn 0.15s ease-out;
 }
 
 .dropdownList {
@@ -68,7 +215,7 @@
 }
 
 .dropdownItem {
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .dropdownItem:last-child {
@@ -77,27 +224,27 @@
 
 .gameLink {
   display: block;
-  padding: 10px 15px;
+  padding: 0.625rem 1rem;
   text-decoration: none;
   color: inherit;
   transition: background-color 0.15s ease;
 }
 
 .gameLink:hover {
-  background-color: #f9fafb;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .gameInfo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
 }
 
 .gameImage {
   flex-shrink: 0;
   border-radius: 4px;
   overflow: hidden;
-  background-color: #f3f4f6;
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .gameImage img {
@@ -117,8 +264,8 @@
 
 .gameTitle {
   font-weight: 500;
-  font-size: 14px;
-  color: #111827;
+  font-size: 0.875rem;
+  color: #e2e8f0;
   margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
@@ -126,40 +273,18 @@
 }
 
 .gamePrice {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #059669;
   font-weight: 600;
 }
 
 .originalPrice {
-  font-size: 11px;
+  font-size: 0.6875rem;
   color: #9ca3af;
   text-decoration: line-through;
   margin-left: 6px;
 }
 
-/* Стиль для інших елементів */
-.Litext {
-  /* ваші існуючі стилі */
-}
-
-.ulist {
-  display: flex;
-  gap: 20px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ulist li a {
-  text-decoration: none;
-  color: whitesmoke;
-  font-size: 14px;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-/* Анімація появи */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -171,48 +296,44 @@
   }
 }
 
-.dropdown {
-  animation: fadeIn 0.15s ease-out;
+/* ─── Nav links ─── */
+.Litext {}
+
+.ulist {
+  display: flex;
+  gap: 1.25rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-/* Для порожніх результатів */
-.noResults {
-  padding: 15px;
-  text-align: center;
-  color: #6b7280;
-  font-size: 14px;
+.ulist li a {
+  text-decoration: none;
+  color: whitesmoke;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: color 0.2s;
 }
 
-/* Адаптація для мобільних пристроїв */
-@media (max-width: 768px) {
-  .Input {
-    width: 100%;
-  }
-
-  .dropdown {
-    position: fixed;
-    width: calc(100% - 32px);
-    left: 16px;
-    top: 60px;
-    max-height: 50vh;
-  }
+.ulist li a:hover {
+  color: #60a5fa;
 }
 
-/* Якщо у вас вже є стилі для header та інших елементів, додайте тільки нові */
-
+/* ─── Right section ─── */
 .main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-right: 30px;
 }
+
 .icon {
   cursor: pointer;
 }
+
 .rightDiv {
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: 1.25rem;
 }
 
 .userProfile {
@@ -221,11 +342,11 @@
 }
 
 .loginBtn {
-  padding: 8px 20px;
-  font-size: 14px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
   font-weight: 600;
   border: none;
-  border-radius: 25px;
+  border-radius: 1.5rem;
   cursor: pointer;
   color: white;
   transition: all 0.3s ease;
@@ -235,7 +356,11 @@
   background-size: 200% 200%;
   box-shadow: 0 4px 15px rgba(0, 102, 255, 0.4);
   text-decoration: none;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  white-space: nowrap;
 }
 
 .loginBtn:hover {
@@ -251,27 +376,18 @@
 }
 
 @keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.loginBtn:hover {
-  animation: gradientShift 3s ease infinite;
-}
 .wraprightDiv {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1.25rem;
 }
 
-/* Avatar */
+/* ─── Avatar ─── */
 .avatarWrapper {
   position: relative;
 }
@@ -286,10 +402,12 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 0.875rem;
   border: none;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 102, 255, 0.35);
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .avatarDropdown {
@@ -298,8 +416,8 @@
   top: calc(100% + 8px);
   background: #0e0f14;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 8px;
-  border-radius: 8px;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   min-width: 140px;
   z-index: 1100;
@@ -309,22 +427,29 @@
   background: transparent;
   color: #e6eef8;
   border: none;
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   width: 100%;
   text-align: left;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  display: block;
+  text-decoration: none;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .dropdownItem:hover {
   background: rgba(255, 255, 255, 0.03);
 }
 
-/* Додайте ці стилі до вашого існуючого CSS файлу */
-
+/* ─── Icon wrapper with tooltip ─── */
 .iconWrapper {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .iconTooltip {
@@ -334,22 +459,21 @@
   transform: translateX(-50%);
   background-color: rgba(84, 84, 84, 0.8);
   color: white;
-  padding: 6px 12px;
+  padding: 0.375rem 0.75rem;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 0.75rem;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.2s ease;
   z-index: 1000;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .iconWrapper:hover .iconTooltip {
   opacity: 1;
 }
 
-/* Створіть стрілку для тултіпа */
 .iconTooltip::after {
   content: "";
   position: absolute;
@@ -361,44 +485,12 @@
   border-color: rgba(57, 57, 57, 0.8) transparent transparent transparent;
 }
 
-@media (max-width: 375px) {
-  .header {
-    padding: 0.5rem 0.75rem;
-  }
-
-  .mobileHeader {
-    gap: 0.5rem;
-  }
-
-  .mobileLogo {
-    font-size: 1.1rem;
-  }
-
-  .mobileActions {
-    gap: 0.5rem;
-  }
-
-  .mobileSearchBtn,
-  .icon {
-    width: 20px;
-    height: 20px;
-  }
-
-  .mobileMenu {
-    width: 85%;
-  }
-
-  .mobileNavItem {
-    padding: 0.875rem 1rem;
-    font-size: 1rem;
-  }
-}
-/* Додайте ці стилі до вашого Header.module.css */
-
-/* Cart icon wrapper with badge */
+/* ─── Cart badge ─── */
 .cartIconWrapper {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cartBadge {
@@ -416,19 +508,34 @@
   align-items: center;
   justify-content: center;
   padding: 0 4px;
-  border: 2px solid #1a1a1a;
+  border: 2px solid #131317;
   z-index: 10;
   animation: popIn 0.3s ease;
 }
 
 @keyframes popIn {
-  0% {
-    transform: scale(0);
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* ─── Small mobile (320-375) ─── */
+@media (max-width: 375px) {
+  .mobileMain {
+    padding: 0.5rem 0.75rem;
+    gap: 0.375rem;
   }
-  50% {
-    transform: scale(1.2);
+
+  .mobileLogo {
+    font-size: 1rem;
   }
-  100% {
-    transform: scale(1);
+
+  .mobileActions {
+    gap: 0.25rem;
+  }
+
+  .loginBtn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
   }
 }

@@ -1,3 +1,4 @@
+/* ─── Carousel: Mobile-first ─── */
 .container {
   position: relative;
   width: 100%;
@@ -5,11 +6,17 @@
 
 .buttonsContainer {
   position: absolute;
-  top: -48px;
+  top: -2.5rem;
   right: 0;
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   z-index: 10;
+}
+
+@media (max-width: 480px) {
+  .buttonsContainer {
+    top: -2rem;
+  }
 }
 
 .scrollButton {
@@ -23,8 +30,10 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 1rem;
   transition: background-color 0.2s ease;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .scrollButton:hover {
@@ -34,22 +43,44 @@
 .carousel {
   overflow: hidden;
   width: 100%;
-  max-width: 79vw; /* максимум — ширина екрану */
 }
 
 .carouselTrack {
   display: flex;
-  gap: 16px;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .carouselTrack {
+    gap: 1rem;
+  }
 }
 
 .gameItem {
-  flex: 0 0 calc(18.666% - 12px);
+  flex: 0 0 45%;
   min-width: 0;
-  flex: 0 0 auto; /* ширина автоматично під контент */
+}
+
+@media (min-width: 480px) {
+  .gameItem {
+    flex: 0 0 35%;
+  }
+}
+
+@media (min-width: 768px) {
+  .gameItem {
+    flex: 0 0 25%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .gameItem {
+    flex: 0 0 auto;
+  }
 }
 
 .gameCard {
-  border-radius: 8px;
+  border-radius: 0.5rem;
   overflow: hidden;
   cursor: pointer;
   transition: box-shadow 0.3s ease;
@@ -68,54 +99,54 @@
 }
 
 .gameInfo {
-  padding-top: 8px;
+  padding-top: 0.5rem;
 }
 
 .gameLabel {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #facc15;
   margin: 0;
 }
 
 .gameTitle {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 4px 0;
+  margin: 0.25rem 0;
 }
 
 .discountContainer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-top: 8px;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 .discountBadge {
   background-color: #3b82f6;
   color: white;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
   display: inline-block;
 }
 
 .priceContainer {
   display: flex;
-  gap: 8px;
-  padding-top: 8px;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 .originalPrice {
   text-decoration: line-through;
   color: #9ca3af;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .currentPrice {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #ffffff;
 }

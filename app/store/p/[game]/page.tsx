@@ -10,9 +10,22 @@ import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import { addToCart } from "@/lib/store/cartSlice";
 import { showToast } from "@/components/ui/Toast";
-import System_requirements from "@/components/ui/cards/Systemrequirements";
-import GameRatingReviews from "@/components/GameRating/GameRatingReviews";
-import GameDescription from "@/components/ui/cartabout/AboutGame";
+import dynamic from "next/dynamic";
+
+const System_requirements = dynamic(
+  () => import("@/components/ui/cards/Systemrequirements"),
+  { loading: () => <div className="h-64 animate-pulse bg-gray-800 rounded-lg mt-12" /> }
+);
+
+const GameRatingReviews = dynamic(
+  () => import("@/components/GameRating/GameRatingReviews"),
+  { loading: () => <div className="h-48 animate-pulse bg-gray-800 rounded-lg mt-8" /> }
+);
+
+const GameDescription = dynamic(
+  () => import("@/components/ui/cartabout/AboutGame"),
+  { loading: () => <div className="h-40 animate-pulse bg-gray-800 rounded-2xl mt-8" /> }
+);
 export default function GamePage() {
   const params = useParams();
   const gameId = params.game as string;
@@ -125,12 +138,12 @@ export default function GamePage() {
   const isPurchased = (id: string) => purchasedIds.includes(id);
 
   return (
-    <div className="p-6">
-      <Link href="/" className="text-blue-500 hover:underline mb-6 block">
+    <div className="p-3 sm:p-4 md:p-6">
+      <Link href="/" className="text-blue-500 hover:underline mb-4 sm:mb-6 block min-h-[44px] flex items-center">
         ← Повернутися до магазину
       </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
         {/* Зображення гри */}
         <div>
           <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-800">
@@ -138,6 +151,7 @@ export default function GamePage() {
               src={game.imageUrl}
               alt={game.title}
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
               priority
             />
@@ -146,7 +160,7 @@ export default function GamePage() {
 
         {/* Інформація про гру */}
         <div>
-          <h1 className="text-4xl font-bold mb-4">{game.title}</h1>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">{game.title}</h1>
 
           {game.developer && (
             <p className="text-gray-400 mb-2">
@@ -199,10 +213,10 @@ export default function GamePage() {
           {/* Ціна */}
           <div className="border-t border-gray-700 pt-6 mt-6">
             <div className="flex items-center gap-3 mb-6">
-              <span className="line-through text-gray-400 text-xl">
+              <span className="line-through text-gray-400 text-base sm:text-xl">
                 {game.originalPrice}
               </span>
-              <span className="text-3xl font-bold">{game.discountedPrice}</span>
+              <span className="text-2xl sm:text-3xl font-bold">{game.discountedPrice}</span>
               {game.discount && (
                 <span className="bg-red-600 text-white px-3 py-1 rounded font-bold">
                   -{game.discount}%
@@ -212,29 +226,30 @@ export default function GamePage() {
             {isPurchased(game.id) ? (
               <Link
                 href="/library"
-                className="w-full block text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors"
+                className="w-full block text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors min-h-[44px] flex items-center justify-center"
               >
                 Перейти в бібліотеку
               </Link>
             ) : (
               <button
                 onClick={handleAddToCart}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors min-h-[44px]"
               >
                 Купити гру
               </button>
             )}
           </div>
-          <div style={{ width: "250px" }}>
+          <div className="w-full sm:w-[250px]">
             <button
               onClick={handleAddToWishlist}
-              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-2 rounded-lg transition-colors w-full flex items-center justify-center gap-2 mt-4"
+              className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg transition-colors w-full flex items-center justify-center gap-2 mt-4 min-h-[44px]"
             >
               <Image
                 src="/save.png"
-                alt="User profile"
+                alt="Wishlist"
                 width={20}
                 height={20}
+                sizes="20px"
               />
               Список бажаного
             </button>

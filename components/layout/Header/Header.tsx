@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./HeaderCss/Header.module.css";
 import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
@@ -11,22 +11,26 @@ import { saveUser, clearUser } from "@/lib/auth/userStore";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store/store";
 
-export default function Header() {
+interface HeaderProps {
+  onToggleSidebar?: () => void;
+  sidebarOpen?: boolean;
+}
+
+export default function Header({ onToggleSidebar, sidebarOpen }: HeaderProps) {
   const { data: session } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredGames, setFilteredGames] = useState<Game[]>([]);
   const [allGames, setAllGames] = useState<Game[]>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
-  // Отримуємо кількість товарів у кошику з Redux
   const cartItemsCount = useSelector((state: RootState) =>
     state.cart.items.reduce((total, item) => total + item.quantity, 0)
   );
 
-  // Save user data to local storage when session changes
   useEffect(() => {
     if (session?.user) {
       saveUser({
@@ -62,7 +66,6 @@ export default function Header() {
     };
   }, []);
 
-  // Фільтруємо ігри при зміні пошукового запиту
   useEffect(() => {
     if (searchQuery.trim() === "") {
       setFilteredGames([]);
@@ -70,17 +73,21 @@ export default function Header() {
       return;
     }
 
-    const filtered = allGames.filter(
-      (game) =>
-        game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        game.description?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const debounceTimer = setTimeout(() => {
+      const query = searchQuery.toLowerCase();
+      const filtered = allGames.filter(
+        (game) =>
+          game.title.toLowerCase().includes(query) ||
+          game.description?.toLowerCase().includes(query)
+      );
 
-    setFilteredGames(filtered.slice(0, 5)); // Показуємо тільки перші 5 результатів
-    setIsDropdownVisible(filtered.length > 0);
+      setFilteredGames(filtered.slice(0, 5));
+      setIsDropdownVisible(filtered.length > 0);
+    }, 200);
+
+    return () => clearTimeout(debounceTimer);
   }, [searchQuery, allGames]);
 
-  // Закриваємо випадаюче меню при кліку поза ним
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -111,6 +118,7 @@ export default function Header() {
   const handleGameSelect = () => {
     setSearchQuery("");
     setIsDropdownVisible(false);
+    setMobileSearchOpen(false);
   };
 
   const handleSignOut = async () => {
@@ -119,7 +127,6 @@ export default function Header() {
     } finally {
       clearUser();
       setIsProfileOpen(false);
-      /* Full navigation resets SessionProvider state so sidebar/header cannot stay “logged in”. */
       window.location.assign("/");
     }
   };
@@ -130,7 +137,8 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <main className={styles.main}>
+      {/* Desktop header */}
+      <div className={styles.desktopMain}>
         <div className={styles.leftDiv}>
           <div className={styles.Input} ref={searchRef}>
             <input
@@ -144,7 +152,6 @@ export default function Header() {
               }
             />
 
-            {/* Випадаюче меню з результатами пошуку */}
             {isDropdownVisible && filteredGames.length > 0 && (
               <div className={styles.dropdown}>
                 <ul className={styles.dropdownList}>
@@ -158,11 +165,13 @@ export default function Header() {
                         <div className={styles.gameInfo}>
                           {game.image && (
                             <div className={styles.gameImage}>
-                              <img
+                              <Image
                                 src={game.image}
                                 alt={game.title}
                                 width={40}
                                 height={40}
+                                sizes="40px"
+                                loading="lazy"
                               />
                             </div>
                           )}
@@ -213,6 +222,7 @@ export default function Header() {
                   alt="Saved games"
                   width={28}
                   height={28}
+                  sizes="28px"
                   className={styles.icon}
                 />
               </Link>
@@ -229,6 +239,7 @@ export default function Header() {
                   alt="Cart"
                   width={28}
                   height={28}
+                  sizes="28px"
                   className={styles.icon}
                 />
                 {cartItemsCount > 0 && (
@@ -278,7 +289,142 @@ export default function Header() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      {/* Mobile header */}
+      <div className={styles.mobileMain}>
+        <button
+          className={styles.burgerBtn}
+          onClick={onToggleSidebar}
+          aria-label={sidebarOpen ? "Закрити меню" : "Відкрити меню"}
+          aria-expanded={sidebarOpen}
+        >
+          <span className={`${styles.burgerLine} ${sidebarOpen ? styles.burgerLineOpen1 : ""}`} />
+          <span className={`${styles.burgerLine} ${sidebarOpen ? styles.burgerLineOpen2 : ""}`} />
+          <span className={`${styles.burgerLine} ${sidebarOpen ? styles.burgerLineOpen3 : ""}`} />
+        </button>
+
+        <Link href="/" className={styles.mobileLogo}>
+          EpicGame
+        </Link>
+
+        <div className={styles.mobileActions}>
+          <button
+            className={styles.mobileSearchBtn}
+            onClick={() => setMobileSearchOpen((s) => !s)}
+            aria-label="Пошук"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
+
+          <Link href="/cart" aria-label="Кошик" className={styles.mobileCartBtn}>
+            <Image src="/icons8.png" alt="Cart" width={24} height={24} sizes="24px" />
+            {cartItemsCount > 0 && (
+              <span className={styles.cartBadge}>{cartItemsCount}</span>
+            )}
+          </Link>
+
+          <div ref={profileRef}>
+            {session?.user ? (
+              <div className={styles.avatarWrapper}>
+                <button
+                  className={styles.avatarButton}
+                  onClick={() => setIsProfileOpen((s) => !s)}
+                  aria-label="User menu"
+                >
+                  {avatarLetter}
+                </button>
+                {isProfileOpen && (
+                  <div className={styles.avatarDropdown}>
+                    {session.user.isAdmin && (
+                      <Link
+                        href="/admin"
+                        className={styles.dropdownItem}
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        Адмін-панель
+                      </Link>
+                    )}
+                    <button
+                      className={styles.dropdownItem}
+                      onClick={handleSignOut}
+                    >
+                      Вийти
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link href="/account" className={styles.loginBtn}>
+                Вхід
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile search bar (expandable) */}
+      {mobileSearchOpen && (
+        <div className={styles.mobileSearchBar} ref={searchRef}>
+          <input
+            type="text"
+            placeholder="Шукати в магазині..."
+            className={styles.mobileSearchInput}
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onFocus={() =>
+              searchQuery.trim() !== "" && setIsDropdownVisible(true)
+            }
+            autoFocus
+          />
+          {isDropdownVisible && filteredGames.length > 0 && (
+            <div className={styles.mobileDropdown}>
+              <ul className={styles.dropdownList}>
+                {filteredGames.map((game) => (
+                  <li key={game.id} className={styles.dropdownItem}>
+                    <Link
+                      href={`/store/p/${game.id}`}
+                      className={styles.gameLink}
+                      onClick={handleGameSelect}
+                    >
+                      <div className={styles.gameInfo}>
+                        {game.image && (
+                          <div className={styles.gameImage}>
+                            <Image
+                              src={game.image}
+                              alt={game.title}
+                              width={40}
+                              height={40}
+                              sizes="40px"
+                              loading="lazy"
+                            />
+                          </div>
+                        )}
+                        <div className={styles.gameDetails}>
+                          <span className={styles.gameTitle}>{game.title}</span>
+                          {game.price && (
+                            <span className={styles.gamePrice}>
+                              ${game.price.current}
+                              {game.price.original && (
+                                <span className={styles.originalPrice}>
+                                  ${game.price.original}
+                                </span>
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 }

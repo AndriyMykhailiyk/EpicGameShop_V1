@@ -1,39 +1,83 @@
+/* ─── Best Offer: Mobile-first ─── */
 .container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 25px;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
   place-items: center;
 }
+
+@media (min-width: 640px) {
+  .container {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.card {
+  width: 100%;
+}
+
+.imageWrapper {
+  position: relative;
+}
+
+.weekOffer {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  color: #facc15;
+}
+
 .image {
   object-fit: cover;
-  border-radius: 16px;
-  height: revert-layer;
+  border-radius: 1rem;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
 }
+
 .blackInfo {
-  padding: 10px 0px 10px 0px;
+  padding: 0.625rem 0;
 }
+
 .title {
-  font-size: 21px;
+  font-size: clamp(1rem, 2vw, 1.3125rem);
   font-weight: 700;
   margin: 0;
 }
+
 .priceBlock {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
 }
+
 .oldPrice {
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1rem;
   color: #888888;
   text-decoration: line-through;
   margin: 0;
 }
+
+.newPrice {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #10b981;
+}
+
 .discount {
   background-color: rgb(0, 166, 255);
-  padding: 1px 6px;
+  padding: 0.0625rem 0.375rem;
   border: 1px solid rgb(0, 166, 255);
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
   color: black;
+  font-weight: 600;
 }

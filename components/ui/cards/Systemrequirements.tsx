@@ -1,290 +1,53 @@
+"use client";
+
 import React from "react";
-import Image from "next/image";
+
+interface RequirementRow {
+  label: string;
+  value: string;
+}
+
+const requirements: RequirementRow[] = [
+  { label: "OS version", value: "Win10 64-bits" },
+  { label: "CPU", value: "Intel i5-8400 or AMD Ryzen5 1500X" },
+  { label: "Memory", value: "8 GB RAM" },
+  { label: "GPU", value: "Nvidia GTX1050Ti 4GB or AMD RX580 4GB" },
+  { label: "DirectX", value: "DirectX 12" },
+  { label: "Storage", value: "20 GB" },
+  { label: "Additional input device", value: "Gamepad" },
+];
+
 export default function System_requirements() {
   return (
-    <div
-      style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-      }}
-    >
-      <div
-        style={{
-          flexWrap: "wrap",
-          paddingTop: "100px",
-          gap: "40px",
-          justifyContent: "center",
-        }}
-      >
-        {/* Windows колонка */}
-        <div
-          style={{
-            flex: "1",
-            minWidth: "50%",
-            maxWidth: "80%",
-            backgroundColor: "#2a2a2a",
-            borderRadius: "8px",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#333",
-              padding: "40px",
-              paddingBottom: "20px",
-              textAlign: "center",
-              display: "flex",
-            }}
-          >
-            <h3
-              style={{
-                margin: "0",
-                fontSize: "18px",
-                fontWeight: "bold",
-                color: "#fff",
-                borderBottom: "3px solid #26baff",
-                paddingBottom: "10px",
-              }}
-            >
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-0">
+      <div className="pt-12 sm:pt-16 md:pt-20">
+        <div className="w-full md:w-4/5 lg:max-w-[80%] bg-[#2a2a2a] rounded-lg overflow-hidden">
+          <div className="bg-[#333] px-4 py-4 sm:px-6 sm:py-5 md:px-10">
+            <h3 className="m-0 text-base sm:text-lg font-bold text-white border-b-[3px] border-[#26baff] pb-2.5 inline-block">
               Рекомендовані системні вимоги
             </h3>
           </div>
 
-          <div style={{ padding: "40px" }}>
-            <h3
-              style={{
-                margin: "0 0 20px 0",
-                fontSize: "18px",
-                color: "#ccc",
-                fontWeight: "600",
-              }}
-            >
+          <div className="p-4 sm:p-6 md:p-10">
+            <h3 className="m-0 mb-4 sm:mb-5 text-base sm:text-lg text-[#ccc] font-semibold">
               Minimax
             </h3>
 
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "15px",
-                paddingBottom: "15px",
-                borderBottom: "1px solid #444",
-              }}
-            >
-              <span
-                style={{
-                  color: "#aaa",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  flex: "1",
-                }}
+            {requirements.map((req, index) => (
+              <div
+                key={req.label}
+                className={`flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-4 py-3 sm:py-3.5 ${
+                  index < requirements.length - 1 ? "border-b border-[#444]" : ""
+                }`}
               >
-                OS version
-              </span>
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: "14px",
-                  textAlign: "right",
-                  flex: "1",
-                  fontWeight: "500",
-                }}
-              >
-                Win10 64-bits
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "15px",
-                paddingBottom: "15px",
-                borderBottom: "1px solid #444",
-              }}
-            >
-              <span
-                style={{
-                  color: "#aaa",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  flex: "1",
-                }}
-              >
-                CPU
-              </span>
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: "14px",
-                  textAlign: "right",
-                  flex: "1",
-                  fontWeight: "500",
-                }}
-              >
-                Intel i5-8400 or AMD Ryzen5 1500X
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "15px",
-                paddingBottom: "15px",
-                borderBottom: "1px solid #444",
-              }}
-            >
-              <span
-                style={{
-                  color: "#aaa",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  flex: "1",
-                }}
-              >
-                Memory
-              </span>
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: "14px",
-                  textAlign: "right",
-                  flex: "1",
-                  fontWeight: "500",
-                }}
-              >
-                8 GB RAM
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "15px",
-                paddingBottom: "15px",
-                borderBottom: "1px solid #444",
-              }}
-            >
-              <span
-                style={{
-                  color: "#aaa",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  flex: "1",
-                }}
-              >
-                GPU
-              </span>
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: "14px",
-                  textAlign: "right",
-                  flex: "1",
-                  fontWeight: "500",
-                }}
-              >
-                Nvidia GTX1050Ti 4GB or AMD RX580 4GB
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "15px",
-                paddingBottom: "15px",
-                borderBottom: "1px solid #444",
-              }}
-            >
-              <span
-                style={{
-                  color: "#aaa",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  flex: "1",
-                }}
-              >
-                DirectX
-              </span>
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: "14px",
-                  textAlign: "right",
-                  flex: "1",
-                  fontWeight: "500",
-                }}
-              >
-                DirectX 12
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "15px",
-                paddingBottom: "15px",
-                borderBottom: "1px solid #444",
-              }}
-            >
-              <span
-                style={{
-                  color: "#aaa",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  flex: "1",
-                }}
-              >
-                Storage
-              </span>
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: "14px",
-                  textAlign: "right",
-                  flex: "1",
-                  fontWeight: "500",
-                }}
-              >
-                20
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "0",
-                paddingBottom: "0",
-                borderBottom: "none",
-              }}
-            >
-              <span
-                style={{
-                  color: "#aaa",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  flex: "1",
-                }}
-              >
-                Additional input device
-              </span>
-              <span
-                style={{
-                  color: "#fff",
-                  fontSize: "14px",
-                  textAlign: "right",
-                  flex: "1",
-                  fontWeight: "500",
-                }}
-              >
-                Gamepad
-              </span>
-            </div>
+                <span className="text-[#aaa] text-sm font-medium sm:flex-1">
+                  {req.label}
+                </span>
+                <span className="text-white text-sm font-medium sm:text-right sm:flex-1">
+                  {req.value}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

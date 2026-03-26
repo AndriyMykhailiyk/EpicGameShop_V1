@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Game } from "@/types/game";
 
 interface GameCardProps {
@@ -8,7 +9,14 @@ export default function GameCard({ game }: GameCardProps) {
   return (
     <div className="game-card">
       <div className="game-card-image">
-        <img src={game.imageUrl} alt={game.title} />
+        <Image
+          src={game.imageUrl}
+          alt={game.title}
+          width={300}
+          height={170}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          loading="lazy"
+        />
       </div>
       <div className="game-card-content">
         <h3 className="game-title">{game.title}</h3>

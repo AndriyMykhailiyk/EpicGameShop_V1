@@ -129,7 +129,9 @@ export default function LibraryPage() {
                       alt={g.title}
                       width={150}
                       height={200}
+                      sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, 150px"
                       className={styles.image}
+                      loading="lazy"
                     />
                   ) : (
                     <div className={styles.placeholder} />

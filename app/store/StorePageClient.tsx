@@ -43,7 +43,9 @@ export default function StorePageClient({ games }: Props) {
             src={activeGame.imageUrl}
             alt={activeGame.title}
             fill
+            sizes="(max-width: 768px) 100vw, 70vw"
             className={styles.heroImage}
+            priority
           />
           <div className={styles.heroOverlay}>
             <h1 className={styles.heroTitle}>{activeGame.title}</h1>
@@ -88,7 +90,9 @@ export default function StorePageClient({ games }: Props) {
                 alt={game.title}
                 width={60}
                 height={80}
+                sizes="60px"
                 className={styles.sidebarImage}
+                loading="lazy"
               />
               <span className={styles.sidebarTitle}>{game.title}</span>
             </div>
@@ -114,7 +118,9 @@ export default function StorePageClient({ games }: Props) {
                   alt={g.title}
                   width={60}
                   height={60}
+                  sizes="60px"
                   className={styles.topPlayedImagePage}
+                  loading="lazy"
                 />
                 <div className={styles.topPlayedTextPage}>
                   <span className={styles.topPlayedNamePage}>{g.title}</span>

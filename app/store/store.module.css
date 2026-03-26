@@ -1,25 +1,52 @@
+/* ─── Store page: Mobile-first ─── */
 .container {
-  width: 81vw;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto; /* Додає вертикальну прокрутку */
+  width: 100%;
+  overflow-y: auto;
 }
 
 .main {
   display: flex;
-  width: 90%;
-  height: 70vh;
-  gap: 24px;
+  flex-direction: column;
+  width: 100%;
+  gap: 1rem;
+  padding: 0 1rem;
 }
 
+@media (min-width: 768px) {
+  .main {
+    flex-direction: row;
+    height: 50vh;
+    gap: 1.5rem;
+    padding: 0;
+    width: 95%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .main {
+    height: 70vh;
+    width: 90%;
+  }
+}
+
+/* ─── Hero section ─── */
 .hero {
   position: relative;
-  flex: 1;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   overflow: hidden;
   display: flex;
   align-items: flex-end;
   background-color: #1a1a20;
+  min-height: 250px;
+  aspect-ratio: 16 / 9;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    flex: 1;
+    min-height: auto;
+    aspect-ratio: unset;
+  }
 }
 
 .heroImage {
@@ -29,33 +56,43 @@
 
 .heroOverlay {
   position: absolute;
-  bottom: 24px;
-  left: 24px;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
   color: white;
 }
 
+@media (min-width: 768px) {
+  .heroOverlay {
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: auto;
+  }
+}
+
 .heroTitle {
-  font-size: 32px;
+  font-size: clamp(1.25rem, 3vw, 2rem);
   font-weight: 700;
-  margin: 0 0 8px 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .tags {
   display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 0.375rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .tag {
   background-color: #2d2d33;
-  padding: 2px 6px;
+  padding: 0.125rem 0.375rem;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 
 .priceSection {
   display: flex;
-  gap: 12px;
+  gap: 0.75rem;
   align-items: center;
 }
 
@@ -69,7 +106,7 @@
   font-weight: 700;
 }
 
-/* Прогрес бар */
+/* ─── Progress bar ─── */
 .progressBar {
   position: absolute;
   top: 0;
@@ -86,35 +123,44 @@
 }
 
 @keyframes progressAnimation {
-  0% {
-    width: 0;
-  }
-  100% {
-    width: 100%;
-  }
+  0% { width: 0; }
+  100% { width: 100%; }
 }
 
-/* Сайдбар */
+/* ─── Store sidebar (game list) ─── */
 .sidebar {
-  width: 220px;
-  display: flex;
+  display: none;
+  width: 100%;
   flex-direction: column;
-  gap: 12px;
+  gap: 0.75rem;
   overflow-y: clip;
 }
 
+@media (min-width: 768px) {
+  .sidebar {
+    display: flex;
+    width: 200px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .sidebar {
+    width: 220px;
+  }
+}
+
 .topPlayed {
-  margin-top: 12px;
-  padding: 12px;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 8px;
+  border-radius: 0.5rem;
 }
 
 .topPlayedTitle {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #fff;
-  margin: 0 0 8px 0;
+  margin: 0 0 0.5rem 0;
   font-weight: 700;
 }
 
@@ -124,7 +170,7 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .topPlayedItem {
@@ -134,26 +180,34 @@
 
 .topPlayedLink {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   align-items: center;
   text-decoration: none;
 }
 
 .topPlayedImage {
-  border-radius: 6px;
+  border-radius: 0.375rem;
   object-fit: cover;
 }
 
 .topPlayedName {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: #ddd;
 }
 
-/* Page-level top played section */
+/* ─── Page-level top played section ─── */
 .topPlayedSection {
-  width: 90%;
-  padding-bottom: 40px;
-  border-radius: 10px;
+  width: 100%;
+  padding: 1.5rem 1rem 2.5rem;
+  border-radius: 0.625rem;
+}
+
+@media (min-width: 768px) {
+  .topPlayedSection {
+    width: 90%;
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 .topPlayedTextPage {
@@ -164,20 +218,20 @@
 
 .topPlayedPricePage {
   color: #9ca3af;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .topPlayedSectionTitle {
   color: #fff;
-  font-size: 22px;
-  margin: 0 0 30px 0;
+  font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+  margin: 0 0 1.5rem 0;
   font-weight: 800;
 }
 
 .topPlayedListPage {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0.625rem;
   padding: 0;
   margin: 0;
   list-style: none;
@@ -190,29 +244,34 @@
 
 .topPlayedLinkPage {
   display: flex;
-  gap: 13px;
+  gap: 0.8125rem;
   align-items: center;
   text-decoration: none;
+  padding: 0.375rem 0;
+  min-height: 44px;
 }
 
 .topPlayedImagePage {
-  border-radius: 6px;
+  border-radius: 0.375rem;
   object-fit: cover;
 }
 
 .topPlayedNamePage {
   color: #e6e6e6;
-  font-size: 16px;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
   font-weight: 700;
 }
 
+/* ─── Sidebar item (clickable game in sidebar) ─── */
 .sidebarItem {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
   cursor: pointer;
   opacity: 0.7;
   transition: all 0.3s ease;
   align-items: center;
+  padding: 0.25rem;
+  min-height: 44px;
 }
 
 .activeItem {
@@ -222,16 +281,29 @@
 }
 
 .sidebarImage {
-  border-radius: 6px;
+  border-radius: 0.375rem;
 }
 
 .sidebarTitle {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: white;
 }
 
+/* ─── Sale games carousel container ─── */
 .saleGamesContainer {
-  padding-right: 66px;
-  padding-top: 60px;
-  padding-bottom: 60px;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .saleGamesContainer {
+    padding: 2.5rem 2rem 2.5rem 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .saleGamesContainer {
+    padding-right: 4rem;
+    padding-top: 3.75rem;
+    padding-bottom: 3.75rem;
+  }
 }

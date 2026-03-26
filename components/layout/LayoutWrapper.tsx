@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useState, useCallback, useEffect } from "react";
 import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
@@ -13,20 +14,36 @@ export default function LayoutWrapper({
   const pathname = usePathname();
   const isAccountPage = pathname === "/account";
   const isAdminRoute = pathname?.startsWith("/admin");
-  // Hide header/sidebar/footer for account and checkout routes
   const isMinimalLayout = isAccountPage || pathname?.startsWith("/checkout");
 
-  // Admin panel: full viewport, not inside store sidebar/header/footer
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen((prev) => !prev);
+  }, []);
+
+  const closeSidebar = useCallback(() => {
+    setSidebarOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add("sidebar-open");
+    } else {
+      document.body.classList.remove("sidebar-open");
+    }
+    return () => {
+      document.body.classList.remove("sidebar-open");
+    };
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    closeSidebar();
+  }, [pathname, closeSidebar]);
+
   if (isAdminRoute) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div className="admin-layout">
         {children}
       </div>
     );
@@ -37,30 +54,22 @@ export default function LayoutWrapper({
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        backgroundColor: "#131317",
-      }}
-    >
-      {/* Ряд: сайдбар + основна колонка; футер нижче — на всю ширину вікна */}
-      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-        <div style={{ flex: 1, flexShrink: 0 }}>
-          <Sidebar />
+    <div className="site-wrapper">
+      {/* Mobile overlay */}
+      <div
+        className={`sidebar-overlay ${sidebarOpen ? "active" : ""}`}
+        onClick={closeSidebar}
+        aria-hidden="true"
+      />
+
+      <div className="site-body">
+        <div className={`sidebar-container ${sidebarOpen ? "open" : ""}`}>
+          <Sidebar onClose={closeSidebar} />
         </div>
 
-        <div
-          style={{
-            flex: 4,
-            display: "flex",
-            flexDirection: "column",
-            minWidth: 0,
-          }}
-        >
-          <Header />
-          <main className="main-content" style={{ flex: 1 }}>
+        <div className="main-column">
+          <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+          <main className="main-content">
             {children}
           </main>
         </div>

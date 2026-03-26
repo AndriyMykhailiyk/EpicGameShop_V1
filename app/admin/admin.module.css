@@ -1,33 +1,79 @@
+/* ─── Admin panel: Mobile-first ─── */
 .shell {
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  display: flex;
+  flex-direction: column;
   background: #0b0f14;
   color: #e8eef5;
 }
 
+@media (min-width: 768px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+/* ─── Admin sidebar ─── */
 .sidebar {
-  border-right: 1px solid #1f2a36;
-  padding: 1.25rem 1rem;
+  border-bottom: 1px solid #1f2a36;
+  padding: 1rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 0.5rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    border-bottom: none;
+    border-right: 1px solid #1f2a36;
+    padding: 1.25rem 1rem;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
 }
 
 .brand {
   font-weight: 700;
   font-size: 1.1rem;
-  margin-bottom: 1rem;
   color: #7cb8ff;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .brand {
+    margin-bottom: 1rem;
+    width: auto;
+  }
 }
 
 .navLink {
-  display: block;
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
   color: #c9d6e5;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
+  min-height: 44px;
+  transition: background 0.2s, color 0.2s;
+}
+
+@media (min-width: 768px) {
+  .navLink {
+    display: block;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.95rem;
+  }
 }
 
 .navLink:hover {
@@ -40,53 +86,95 @@
   color: #fff;
 }
 
+/* ─── Admin main content ─── */
 .main {
-  padding: 1.5rem 2rem;
+  padding: 1rem;
+  min-width: 0;
+  overflow-x: auto;
 }
 
+@media (min-width: 768px) {
+  .main {
+    padding: 1.5rem 2rem;
+  }
+}
+
+/* ─── Cards / stats ─── */
 .cardGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
   margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .cardGrid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
 }
 
 .statCard {
   background: #121a24;
   border: 1px solid #1f2a36;
-  border-radius: 12px;
-  padding: 1rem 1.1rem;
+  border-radius: 0.75rem;
+  padding: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .statCard {
+    padding: 1rem 1.1rem;
+  }
 }
 
 .statLabel {
-  font-size: 0.85rem;
+  font-size: 0.8125rem;
   color: #8fa3b8;
 }
 
 .statValue {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
   font-weight: 700;
   margin-top: 0.35rem;
 }
 
+/* ─── Tables ─── */
 .tableWrap {
   margin-top: 1rem;
-  overflow: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid #1f2a36;
-  border-radius: 10px;
+  border-radius: 0.625rem;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
+  min-width: 500px;
+}
+
+@media (min-width: 768px) {
+  .table {
+    font-size: 0.9rem;
+    min-width: auto;
+  }
 }
 
 .table th,
 .table td {
-  padding: 0.65rem 0.75rem;
+  padding: 0.5rem 0.625rem;
   text-align: left;
   border-bottom: 1px solid #1f2a36;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .table th,
+  .table td {
+    padding: 0.65rem 0.75rem;
+    white-space: normal;
+  }
 }
 
 .table th {
@@ -95,6 +183,7 @@
   font-weight: 600;
 }
 
+/* ─── Forms ─── */
 .form {
   display: flex;
   flex-direction: column;
@@ -112,10 +201,13 @@
 .form textarea {
   width: 100%;
   padding: 0.55rem 0.65rem;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   border: 1px solid #2a3a4d;
   background: #0f141c;
   color: #e8eef5;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  min-height: 44px;
 }
 
 .form textarea {
@@ -123,14 +215,18 @@
   resize: vertical;
 }
 
+/* ─── Buttons ─── */
 .btn {
   padding: 0.55rem 1rem;
-  border-radius: 8px;
+  border-radius: 0.5rem;
   border: none;
   cursor: pointer;
   font-weight: 600;
   background: #2563eb;
   color: #fff;
+  min-height: 44px;
+  font-size: 0.875rem;
+  transition: background 0.2s;
 }
 
 .btn:hover {
@@ -156,6 +252,7 @@
   font-size: 0.9rem;
 }
 
+/* ─── Login page ─── */
 .loginPage {
   min-height: 100vh;
   display: flex;
@@ -170,8 +267,14 @@
   max-width: 400px;
   background: #121a24;
   border: 1px solid #1f2a36;
-  border-radius: 14px;
-  padding: 1.75rem;
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .loginCard {
+    padding: 1.75rem;
+  }
 }
 
 .loginTitle {
@@ -180,17 +283,31 @@
   margin-bottom: 0.5rem;
 }
 
+/* ─── Charts ─── */
 .chartBox {
   margin-top: 1.5rem;
-  height: 320px;
+  height: 250px;
   background: #121a24;
   border: 1px solid #1f2a36;
-  border-radius: 12px;
-  padding: 1rem;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .chartBox {
+    height: 320px;
+    padding: 1rem;
+  }
 }
 
 .chartBoxTall {
-  height: 360px;
+  height: 280px;
+}
+
+@media (min-width: 768px) {
+  .chartBoxTall {
+    height: 360px;
+  }
 }
 
 .chartGrid2 {

@@ -31,7 +31,13 @@
 .inner {
   width: min(1200px, 92%);
   margin: 0 auto;
-  padding: 3rem 0 2rem;
+  padding: 2rem 0 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding: 3rem 0 2rem;
+  }
 }
 
 .grid {
@@ -110,6 +116,15 @@
   transition:
     color 0.2s ease,
     transform 0.2s ease;
+  padding: 0.25rem 0;
+  min-height: 44px;
+}
+
+@media (min-width: 768px) {
+  .link {
+    min-height: auto;
+    padding: 0;
+  }
 }
 
 .link:hover {

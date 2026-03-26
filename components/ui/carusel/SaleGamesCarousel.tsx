@@ -48,9 +48,11 @@ export default function SaleGamesCarousel({ games }: Props) {
                   <Image
                     src={game.imageUrl}
                     alt={game.title}
-                    width={100}
-                    height={150}
+                    width={200}
+                    height={300}
+                    sizes="(max-width: 480px) 45vw, (max-width: 768px) 35vw, (max-width: 1200px) 25vw, 200px"
                     className={styles.gameImage}
+                    loading="lazy"
                   />
 
                   <div className={styles.gameInfo}>

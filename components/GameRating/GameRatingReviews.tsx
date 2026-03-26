@@ -173,7 +173,7 @@ export default function GameRatingReviews({
 
   const renderStars = (rating: number, isInteractive: boolean = false) => {
     return (
-      <div className="flex gap-1">
+      <div className="flex flex-wrap gap-0.5 sm:gap-1">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
           <button
             key={star}
@@ -181,7 +181,7 @@ export default function GameRatingReviews({
             onMouseEnter={() => isInteractive && setHoverRating(star)}
             onMouseLeave={() => isInteractive && setHoverRating(0)}
             disabled={!isInteractive}
-            className={`text-2xl transition-all ${
+            className={`text-xl sm:text-2xl transition-all p-1 ${
               isInteractive
                 ? "cursor-pointer hover:scale-110"
                 : "cursor-default"
@@ -213,11 +213,11 @@ export default function GameRatingReviews({
   return (
     <div className="mt-12 border-t border-gray-700 pt-8">
       {/* Середній рейтинг */}
-      <div className="mb-8 bg-gray-800 p-6 rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">Рейтинг гри</h2>
-        <div className="flex items-center gap-6">
+      <div className="mb-6 sm:mb-8 bg-gray-800 p-4 sm:p-6 rounded-lg">
+        <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Рейтинг гри</h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
           <div className="text-center">
-            <div className="text-5xl font-bold text-yellow-400">
+            <div className="text-4xl sm:text-5xl font-bold text-yellow-400">
               {calculateAverageRating()}
             </div>
             <div className="text-gray-400 text-sm mt-1">з 10</div>
@@ -231,8 +231,8 @@ export default function GameRatingReviews({
       </div>
 
       {/* Форма оцінки та відгуку */}
-      <div className="mb-8 bg-gray-800 p-6 rounded-lg">
-        <h3 className="text-xl font-bold mb-4">Ваша оцінка</h3>
+      <div className="mb-6 sm:mb-8 bg-gray-800 p-4 sm:p-6 rounded-lg">
+        <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Ваша оцінка</h3>
 
         {!isAuthenticated ? (
           <div className="bg-yellow-900 border border-yellow-600 text-yellow-200 px-4 py-3 rounded mb-4">
@@ -297,10 +297,10 @@ export default function GameRatingReviews({
         ) : (
           <div className="space-y-6">
             {reviews.map((review) => (
-              <div key={review.id} className="bg-gray-800 p-6 rounded-lg">
-                <div className="flex items-start justify-between mb-3">
+              <div key={review.id} className="bg-gray-800 p-4 sm:p-6 rounded-lg">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-0 mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                       {review.user_name.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -310,7 +310,7 @@ export default function GameRatingReviews({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 ml-[52px] sm:ml-0">
                     <span className="text-yellow-400 font-bold text-lg">
                       {review.rating}/10
                     </span>
