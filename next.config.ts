@@ -29,6 +29,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.topgames.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.freetogame.com",
+      },
     ],
   },
 
