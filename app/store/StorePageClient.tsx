@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import Link from "next/link";
 import styles from "./store.module.css";
 import { Game } from "@/types/game";
@@ -39,7 +39,7 @@ export default function StorePageClient({ games }: Props) {
       <div className={styles.main}>
         <div className={styles.hero}>
           <h1>Великак картинка вішліст</h1>
-          <Image
+          <GameImage
             src={activeGame.imageUrl}
             alt={activeGame.title}
             fill
@@ -85,7 +85,7 @@ export default function StorePageClient({ games }: Props) {
               }`}
               onClick={() => setActiveIndex(idx)}
             >
-              <Image
+              <GameImage
                 src={game.imageUrl}
                 alt={game.title}
                 width={60}
@@ -113,7 +113,7 @@ export default function StorePageClient({ games }: Props) {
                 href={`/store/p/${g.id}`}
                 className={styles.topPlayedLinkPage}
               >
-                <Image
+                <GameImage
                   src={g.imageUrl}
                   alt={g.title}
                   width={60}

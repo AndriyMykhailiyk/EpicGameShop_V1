@@ -2,7 +2,7 @@
 
 import { MegaSaleTimer } from "./MegaSaleTimercomp";
 import { Game } from "@/types/game";
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import Link from "next/link";
 
 type Props = {
@@ -17,7 +17,7 @@ export const MegaSaleCard = ({ game }: Props) => {
       </div>
 
       <div className="relative w-24 h-32 flex-shrink-0 rounded-lg overflow-hidden">
-        <Image
+        <GameImage
           src={game.imageUrl}
           alt={game.title}
           fill

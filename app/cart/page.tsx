@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import { useSelector, useDispatch } from "react-redux";
 import styles from "./page.module.css";
 import { RootState } from "@/lib/store/store";
@@ -54,7 +54,7 @@ export default function CartPage() {
           {items.map((item) => (
             <div key={item.id} className={styles.cartItem}>
               <div className={styles.itemImage}>
-                <Image
+                <GameImage
                   src={item.imageUrl}
                   alt={item.title}
                   width={100}

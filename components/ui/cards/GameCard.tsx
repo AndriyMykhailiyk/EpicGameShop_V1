@@ -1,4 +1,4 @@
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import { Game } from "@/types/game";
 
 interface GameCardProps {
@@ -9,7 +9,7 @@ export default function GameCard({ game }: GameCardProps) {
   return (
     <div className="game-card">
       <div className="game-card-image">
-        <Image
+        <GameImage
           src={game.imageUrl}
           alt={game.title}
           width={300}

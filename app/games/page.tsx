@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import { getSaleGames } from "@/lib/api/game";
 import styles from "./GamesPage.module.css";
 
@@ -91,7 +91,7 @@ export default function GamesPage() {
           <div key={game.id} className={styles.card}>
             <Link href={`/store/p/${game.id}`} className={styles.cardLink}>
               {game.imageUrl && (
-                <Image
+                <GameImage
                   src={game.imageUrl}
                   alt={game.title}
                   width={300}

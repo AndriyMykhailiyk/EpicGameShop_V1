@@ -1,7 +1,7 @@
 "use client";
 
 import useEmblaCarousel from "embla-carousel-react";
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import Link from "next/link";
 import { useCallback } from "react";
 import { Game } from "@/types/game";
@@ -45,7 +45,7 @@ export default function SaleGamesCarousel({ games }: Props) {
             <div key={game.id} className={styles.gameItem}>
               <Link href={`/store/p/${game.id}`}>
                 <div className={styles.gameCard}>
-                  <Image
+                  <GameImage
                     src={game.imageUrl}
                     alt={game.title}
                     width={200}

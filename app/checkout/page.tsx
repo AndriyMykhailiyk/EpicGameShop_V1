@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import { useSelector, useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
 import styles from "./page.module.css";
@@ -500,7 +500,7 @@ export default function CheckoutPage() {
           <div className={styles.summaryItems}>
             {items.map((it) => (
               <div key={it.id} className={styles.summaryItem}>
-                <Image
+                <GameImage
                   src={it.imageUrl}
                   alt={it.title}
                   width={60}

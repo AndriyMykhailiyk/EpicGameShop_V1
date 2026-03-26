@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -10,6 +11,7 @@ import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import { addToCart } from "@/lib/store/cartSlice";
 import { showToast } from "@/components/ui/Toast";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import dynamic from "next/dynamic";
 
 const System_requirements = dynamic(
@@ -139,15 +141,19 @@ export default function GamePage() {
 
   return (
     <div className="p-3 sm:p-4 md:p-6">
-      <Link href="/" className="text-blue-500 hover:underline mb-4 sm:mb-6 block min-h-[44px] flex items-center">
-        ← Повернутися до магазину
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: "Головна", href: "/" },
+          { label: "Крамниця", href: "/store" },
+          { label: game.title },
+        ]}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
         {/* Зображення гри */}
         <div>
           <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-800">
-            <Image
+            <GameImage
               src={game.imageUrl}
               alt={game.title}
               fill

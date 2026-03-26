@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import styles from "./saved.module.css";
 
 interface SavedGame {
@@ -55,7 +55,7 @@ export default function SavedGamesPage() {
         <div className={styles.gamesList}>
           {savedGames.map((game) => (
             <div key={game.id} className={styles.gameCard}>
-              <Image
+              <GameImage
                 src={game.image}
                 alt={game.title}
                 width={300}

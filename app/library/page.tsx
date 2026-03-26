@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import GameImage from "@/components/ui/GameImage";
 import Link from "next/link";
 import styles from "./library.module.css";
 
@@ -124,7 +124,7 @@ export default function LibraryPage() {
               <Link href={`/store/p/${g.id}`} className={styles.cardLink}>
                 <div className={styles.imageWrap}>
                   {g.image ? (
-                    <Image
+                    <GameImage
                       src={g.image}
                       alt={g.title}
                       width={150}
