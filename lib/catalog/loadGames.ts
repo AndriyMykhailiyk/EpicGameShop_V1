@@ -2,44 +2,53 @@ import { logger } from "@/lib/logger";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import type { Game } from "@/types/game";
 import type { GameRow } from "./gameMapper";
-import { mapGameRowToGame } from "./gameMapper";
+import { mergeStaticCatalogWithDbRows } from "./mergeCatalog";
 import { fetchFreeToGameCatalog } from "./freeToGameApi";
+import { getSaleGames } from "@/lib/api/game";
 
 /**
- * Loads the storefront catalog: Supabase `games` first, then free-to-play
- * titles from the FreeToGame public API appended at the end.
+ * Loads the storefront catalog combining three sources:
  *
- * - DB games (where `is_active = true`) are placed at the top of the list.
- * - FreeToGame entries are appended after all DB games.
- * - Duplicates (by title, case-insensitive) from the API are excluded when
- *   they already exist in the DB list.
- * - If the DB is empty, only API games are shown (and vice-versa).
+ * 1. **Static catalog** (`getSaleGames()`) — built-in games that always appear.
+ * 2. **Supabase DB** (`games` where `is_active = true`) — admin-added or
+ *    admin-edited games. DB rows override static entries with the same `id`;
+ *    extra DB-only rows are appended after the static list.
+ * 3. **FreeToGame API** — free-to-play titles appended at the end.
  *
- * @returns Combined list of games for store pages and APIs
+ * Deduplication:
+ * - Static ↔ DB: matched by `id` (DB row wins).
+ * - Combined ↔ FreeToGame: matched by title (case-insensitive); duplicates
+ *   from the API are excluded.
+ *
+ * @returns Combined list of games for store pages and search
  */
 export async function loadCatalogGames(): Promise<Game[]> {
-  const [dbGames, apiGames] = await Promise.all([
-    loadDatabaseGames(),
+  const [dbRows, apiGames] = await Promise.all([
+    loadDatabaseRows(),
     loadApiGames(),
   ]);
 
-  const dbTitles = new Set(
-    dbGames.map((g) => g.title.toLowerCase().trim()),
+  const staticGames = getSaleGames();
+  const coreGames = mergeStaticCatalogWithDbRows(staticGames, dbRows);
+
+  const coreTitles = new Set(
+    coreGames.map((g) => g.title.toLowerCase().trim()),
   );
 
   const uniqueApiGames = apiGames.filter(
-    (g) => !dbTitles.has(g.title.toLowerCase().trim()),
+    (g) => !coreTitles.has(g.title.toLowerCase().trim()),
   );
 
-  return [...dbGames, ...uniqueApiGames];
+  return [...coreGames, ...uniqueApiGames];
 }
 
 /**
- * Fetches active games from the Supabase `games` table.
+ * Fetches active game rows from the Supabase `games` table.
+ * Returns raw rows so the caller can merge them with static data.
  *
- * @returns Mapped `Game[]` ordered by `created_at` ascending, or empty on failure
+ * @returns `GameRow[]` ordered by `created_at` ascending, or empty on failure
  */
-async function loadDatabaseGames(): Promise<Game[]> {
+async function loadDatabaseRows(): Promise<GameRow[]> {
   try {
     const { data, error } = await supabaseAdmin
       .from("games")
@@ -55,8 +64,7 @@ async function loadDatabaseGames(): Promise<Game[]> {
       return [];
     }
 
-    const rows = (data ?? []) as GameRow[];
-    return rows.map(mapGameRowToGame);
+    return (data ?? []) as GameRow[];
   } catch (err) {
     logger.error("Unexpected DB catalog load failure", {
       error: err instanceof Error ? err.message : String(err),

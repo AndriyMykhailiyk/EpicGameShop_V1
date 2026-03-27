@@ -9,6 +9,7 @@ export type SidebarNavItem = {
 
 export const sidebarNavItems: SidebarNavItem[] = [
   { id: "store", label: "Крамниця", icon: "🛒", href: "/store" },
+  { id: "discover", label: "Каталог", icon: "🔍", href: "/discover" },
   {
     id: "library",
     label: "Бібліотека",
@@ -23,5 +24,5 @@ export const sidebarNavItems: SidebarNavItem[] = [
     href: "/orders",
     requiresAuth: true,
   },
-  { id: "fab", label: "Fab", icon: "🎁", href: "/fab" },
+  { id: "news", label: "Новини", icon: "📰", href: "/news" },
 ];

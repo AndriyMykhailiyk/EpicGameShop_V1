@@ -202,10 +202,10 @@ export default function Header({ onToggleSidebar, sidebarOpen }: HeaderProps) {
           <div className={styles.Litext}>
             <ul className={styles.ulist}>
               <li>
-                <a>Цікавинки</a>
+                <Link href="/discover">Каталог</Link>
               </li>
               <li>
-                <a>Новинки</a>
+                <Link href="/discover?sort=newest">Новинки</Link>
               </li>
               <li>
                 <Link href="/games">Увесь асортимент</Link>

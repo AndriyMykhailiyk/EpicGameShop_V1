@@ -81,6 +81,17 @@ To remove the junction later: `rd .next` (removes the link, not the target folde
 
 Open [http://localhost:3000](http://localhost:3000). Admin UI: [http://localhost:3000/admin/login](http://localhost:3000/admin/login).
 
+## Informational pages (Ukrainian)
+
+Static App Router pages with metadata and inline-styled layouts:
+
+| Path | Title (metadata) |
+|------|------------------|
+| `/about` | Про нас — Epic Games Store |
+| `/terms` | Умови використання — Epic Games Store |
+| `/privacy` | Політика конфіденційності — Epic Games Store |
+| `/support` | Центр підтримки — Epic Games Store |
+
 ## Admin panel
 
 | Area | Path | Features |
