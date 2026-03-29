@@ -25,7 +25,7 @@ type PaymentMethod = "card" | "paypal";
  * order placement, receipt handling.
  */
 export function useCheckoutForm() {
-  const { data: session } = useSession();
+  const { data: session, status: sessionStatus } = useSession();
   const items = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
 
@@ -262,6 +262,7 @@ export function useCheckoutForm() {
   return {
     items,
     session,
+    sessionStatus,
     email,
     emailTouched,
     emailError,

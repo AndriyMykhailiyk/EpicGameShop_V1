@@ -17,6 +17,44 @@ import cStyles from "@/components/checkout/checkout.module.css";
 export default function CheckoutPage() {
   const form = useCheckoutForm();
 
+  if (form.sessionStatus === "loading") {
+    return (
+      <div className={styles.container}>
+        <div className={cStyles.emptyState}>
+          <div className={cStyles.loaderRing} />
+          <p className={cStyles.emptyText}>Завантаження...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (form.sessionStatus === "unauthenticated" || !form.session) {
+    return (
+      <div className={styles.container}>
+        <div className={cStyles.emptyState}>
+          <svg
+            className={cStyles.emptyIcon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <h2 className={cStyles.emptyTitle}>Увійдіть в акаунт</h2>
+          <p className={cStyles.emptyText}>
+            Для оформлення замовлення потрібно авторизуватися.
+          </p>
+          <Link href="/account" className={cStyles.emptyLink}>
+            Увійти в акаунт
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (form.items.length === 0 && !form.showReceipt) {
     return (
       <div className={styles.container}>

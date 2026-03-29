@@ -3,6 +3,7 @@
 import Link from "next/link";
 import GameImage from "@/components/ui/GameImage";
 import { useSelector, useDispatch } from "react-redux";
+import { useSession } from "next-auth/react";
 import styles from "./page.module.css";
 import { RootState } from "@/lib/store/store";
 import {
@@ -13,8 +14,10 @@ import {
 } from "@/lib/store/cartSlice";
 
 export default function CartPage() {
+  const { data: session, status } = useSession();
   const items = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
+  const isAuthenticated = status === "authenticated" && !!session;
 
   // ✅ Коректний парсер ціни
   const parsePrice = (price: string) => {
@@ -117,9 +120,15 @@ export default function CartPage() {
             </span>
           </div>
 
-          <Link href="/checkout" className={styles.checkoutButton}>
-            Оформити покупку
-          </Link>
+          {isAuthenticated ? (
+            <Link href="/checkout" className={styles.checkoutButton}>
+              Оформити покупку
+            </Link>
+          ) : (
+            <Link href="/account" className={styles.checkoutButton}>
+              Увійти для покупки
+            </Link>
+          )}
 
           <button
             onClick={() => dispatch(clearCart())}
