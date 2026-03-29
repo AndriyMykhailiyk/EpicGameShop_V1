@@ -3,6 +3,8 @@ import BestOffer from "@/components/ui/grid/BestOffer";
 import { MegaSaleSection } from "@/components/MegaSale/MegaSaleSection";
 import { loadCatalogGames } from "@/lib/catalog/loadGames";
 
+export const revalidate = 300;
+
 export default async function Home() {
   const saleGames = await loadCatalogGames();
 

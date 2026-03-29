@@ -46,12 +46,15 @@ function parsePrice(raw: string | undefined): number {
   return isNaN(num) ? 0 : num;
 }
 
+const ITEMS_PER_PAGE = 20;
+
 type Props = { games: Game[] };
 
 export default function DiscoverClient({ games }: Props) {
   const searchParams = useSearchParams();
 
   const [search, setSearch] = useState("");
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [sortBy, setSortBy] = useState<SortOption>(
     (searchParams.get("sort") as SortOption) || "popular"
   );
@@ -132,6 +135,7 @@ export default function DiscoverClient({ games }: Props) {
     setShowOnSale(false);
     setShowMegaSale(false);
     setShowEarlyAccess(false);
+    setVisibleCount(ITEMS_PER_PAGE);
   }, [priceMax]);
 
   const hasActiveFilters =
@@ -143,6 +147,10 @@ export default function DiscoverClient({ games }: Props) {
     showOnSale ||
     showMegaSale ||
     showEarlyAccess;
+
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [search, selectedPlatforms, selectedTags, maxPrice, showFreeOnly, showOnSale, showMegaSale, showEarlyAccess, sortBy]);
 
   const filtered = useMemo(() => {
     const query = search.toLowerCase().trim();
@@ -475,7 +483,7 @@ export default function DiscoverClient({ games }: Props) {
             </div>
           </div>
 
-          {/* Game grid */}
+          {/* Game grid with pagination */}
           {sorted.length === 0 ? (
             <div className={styles.empty}>
               <div className={styles.emptyIcon}>🎮</div>
@@ -485,11 +493,34 @@ export default function DiscoverClient({ games }: Props) {
               </p>
             </div>
           ) : (
-            <div className={styles.grid}>
-              {sorted.map((game) => (
-                <GameCard key={game.id} game={game} />
-              ))}
-            </div>
+            <>
+              <div className={styles.grid}>
+                {sorted.slice(0, visibleCount).map((game) => (
+                  <GameCard key={game.id} game={game} />
+                ))}
+              </div>
+              {visibleCount < sorted.length && (
+                <div style={{ display: "flex", justifyContent: "center", margin: "2rem 0" }}>
+                  <button
+                    onClick={() => setVisibleCount((prev) => prev + ITEMS_PER_PAGE)}
+                    style={{
+                      padding: "0.75rem 2.5rem",
+                      background: "#3b82f6",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "0.5rem",
+                      fontWeight: 600,
+                      fontSize: "0.9375rem",
+                      cursor: "pointer",
+                      minHeight: "44px",
+                      transition: "background 0.2s",
+                    }}
+                  >
+                    Показати ще ({sorted.length - visibleCount} залишилось)
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
       </div>

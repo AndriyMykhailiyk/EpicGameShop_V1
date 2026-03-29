@@ -7,7 +7,6 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
-import { getSaleGames } from "@/lib/api/game";
 import { Game } from "@/types/game";
 import { addToCart } from "@/lib/store/cartSlice";
 import { showToast } from "@/components/ui/Toast";
@@ -28,40 +27,51 @@ const GameDescription = dynamic(
   () => import("@/components/ui/cartabout/AboutGame"),
   { loading: () => <div className="h-40 animate-pulse bg-gray-800 rounded-2xl mt-8" /> }
 );
+
 export default function GamePage() {
   const params = useParams();
   const gameId = params.game as string;
   const dispatch = useDispatch();
   const router = useRouter();
-  const [catalog, setCatalog] = useState<Game[] | null>(null);
+  const [game, setGame] = useState<Game | null | undefined>(undefined);
 
   useEffect(() => {
+    if (!gameId) return;
+
     let cancelled = false;
+
     (async () => {
       try {
-        const res = await fetch("/api/games/catalog");
-        if (!res.ok) {
-          throw new Error("catalog");
+        const res = await fetch(`/api/games/${encodeURIComponent(gameId)}`, {
+          cache: "no-store",
+        });
+
+        if (res.status === 404) {
+          if (!cancelled) setGame(null);
+          return;
         }
+
+        if (!res.ok) {
+          throw new Error(`API responded with ${res.status}`);
+        }
+
         const data = await res.json();
         if (!cancelled) {
-          setCatalog((data.games ?? []) as Game[]);
+          setGame(data.game ?? null);
         }
       } catch {
         if (!cancelled) {
-          setCatalog(getSaleGames());
+          setGame(null);
         }
       }
     })();
+
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [gameId]);
 
-  const allGames = catalog ?? [];
-  const game = allGames.find((g) => g.id === gameId);
-
-  if (catalog === null) {
+  if (game === undefined) {
     return (
       <div className="p-6">
         <p className="text-gray-400">Завантаження…</p>

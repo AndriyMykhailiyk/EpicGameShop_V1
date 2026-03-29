@@ -1,26 +1,11 @@
 "use client";
 
-import React, { useState, useCallback, useMemo } from "react";
+import React from "react";
 import Link from "next/link";
-import { useSelector, useDispatch } from "react-redux";
-import { useSession } from "next-auth/react";
-import { RootState } from "@/lib/store/store";
-import { clearCart } from "@/lib/store/cartSlice";
-import { getItemPrice, formatPrice } from "@/lib/checkout/priceUtils";
-import { validateEmail } from "@/lib/checkout/validation";
-import {
-  generateOrderNumber,
-  generateActivationKeys,
-  mergePurchasedGames,
-  saveOrderLocally,
-  buildServerOrderPayload,
-  type FlatActivationKey,
-} from "@/lib/checkout/orderUtils";
+import { useCheckoutForm } from "@/lib/checkout/useCheckoutForm";
 
 import SecurityBadges from "@/components/checkout/SecurityBadges";
-import CardPaymentForm, {
-  type CardFormData,
-} from "@/components/checkout/CardPaymentForm";
+import CardPaymentForm from "@/components/checkout/CardPaymentForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import PromoCode from "@/components/checkout/PromoCode";
 import ReceiptModal from "@/components/checkout/ReceiptModal";
@@ -29,302 +14,10 @@ import TermsModal from "@/components/checkout/TermsModal";
 import styles from "./page.module.css";
 import cStyles from "@/components/checkout/checkout.module.css";
 
-type PaymentMethod = "card" | "paypal";
-
 export default function CheckoutPage() {
-  const { data: session } = useSession();
-  const items = useSelector((state: RootState) => state.cart.items);
-  const dispatch = useDispatch();
+  const form = useCheckoutForm();
 
-  const [email, setEmail] = useState("");
-  const [emailTouched, setEmailTouched] = useState(false);
-  const [emailError, setEmailError] = useState<string | null>(null);
-
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
-  const [cardFormValid, setCardFormValid] = useState(false);
-
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [savePaymentData, setSavePaymentData] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
-
-  const [promoCode, setPromoCode] = useState<string | null>(null);
-  const [promoDiscount, setPromoDiscount] = useState(0);
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSendingEmail, setIsSendingEmail] = useState(false);
-
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [orderNumber, setOrderNumber] = useState("");
-  const [activationKeys, setActivationKeys] = useState<FlatActivationKey[]>([]);
-  const [orderServerSaveMessage, setOrderServerSaveMessage] = useState<
-    string | null
-  >(null);
-
-  /* ─── Price calculations ─── */
-  const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0),
-    [items],
-  );
-
-  const effectiveSubtotal = Math.max(0, subtotal - promoDiscount);
-  const tax = +(effectiveSubtotal * 0.2).toFixed(2);
-  const total = +(effectiveSubtotal + tax).toFixed(2);
-
-  /* ─── Email validation ─── */
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    setEmail(val);
-    if (emailTouched) {
-      setEmailError(validateEmail(val).error);
-    }
-  };
-
-  const handleEmailBlur = () => {
-    setEmailTouched(true);
-    setEmailError(validateEmail(email).error);
-  };
-
-  /* ─── Card form callback ─── */
-  const handleCardFormChange = useCallback(
-    (_data: CardFormData, isValid: boolean) => {
-      setCardFormValid(isValid);
-    },
-    [],
-  );
-
-  /* ─── Promo code ─── */
-  const handlePromoApply = useCallback(
-    async (
-      code: string,
-    ): Promise<{ valid: boolean; discount: number; error?: string }> => {
-      try {
-        const res = await fetch("/api/checkout/validate-promo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code }),
-        });
-
-        const body = await res.json();
-
-        if (!res.ok || !body.valid) {
-          return { valid: false, discount: 0, error: body.error };
-        }
-
-        const disc =
-          body.discountType === "percentage"
-            ? (subtotal * body.discount) / 100
-            : body.discount;
-
-        setPromoCode(code);
-        setPromoDiscount(Math.min(disc, subtotal));
-        return { valid: true, discount: disc };
-      } catch {
-        return {
-          valid: false,
-          discount: 0,
-          error: "Не вдалося перевірити промокод",
-        };
-      }
-    },
-    [subtotal],
-  );
-
-  const handlePromoRemove = useCallback(() => {
-    setPromoCode(null);
-    setPromoDiscount(0);
-  }, []);
-
-  /* ─── Form validity check ─── */
-  const isFormValid = useMemo(() => {
-    const emailOk = validateEmail(email).isValid;
-    const paymentOk = paymentMethod === "paypal" || cardFormValid;
-    return emailOk && paymentOk && termsAccepted && items.length > 0;
-  }, [email, paymentMethod, cardFormValid, termsAccepted, items.length]);
-
-  /* ─── Email receipt ─── */
-  const sendEmailReceipt = async (orderData: {
-    orderNumber: string;
-    items: { title: string; quantity: number; price: number }[];
-    keys: { title: string; keys: string[] }[];
-  }) => {
-    setIsSendingEmail(true);
-
-    try {
-      const emailHTML = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Дякуємо за покупку!</h2>
-          <p><strong>Номер замовлення:</strong> ${orderData.orderNumber}</p>
-          <p><strong>Дата:</strong> ${new Date().toLocaleString()}</p>
-          <h3>Куплені товари:</h3>
-          <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr style="background: #f5f5f5;">
-                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Гра</th>
-                <th style="padding: 10px; text-align: center; border: 1px solid #ddd;">Кількість</th>
-                <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">Ціна</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${orderData.items
-                .map(
-                  (item) => `
-                <tr>
-                  <td style="padding: 10px; border: 1px solid #ddd;">${item.title}</td>
-                  <td style="padding: 10px; text-align: center; border: 1px solid #ddd;">${item.quantity}</td>
-                  <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">${item.price.toFixed(2)} грн</td>
-                </tr>
-              `,
-                )
-                .join("")}
-            </tbody>
-          </table>
-          <h3 style="margin-top: 20px;">Ключі активації:</h3>
-          ${orderData.keys
-            .map(
-              (keyItem) => `
-            <div style="margin: 10px 0; padding: 10px; background: #f9f9f9; border-left: 3px solid #007bff;">
-              <p style="margin: 5px 0;"><strong>${keyItem.title}</strong></p>
-              ${keyItem.keys
-                .map(
-                  (key) => `
-                <p style="margin: 5px 0; font-family: monospace; background: white; padding: 5px; border: 1px solid #ddd;">${key}</p>
-              `,
-                )
-                .join("")}
-            </div>
-          `,
-            )
-            .join("")}
-          <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px;">
-            <p><strong>Підсумок:</strong></p>
-            <p>Ціна: ${subtotal.toFixed(2)} грн</p>
-            <p>ПДВ (20%): ${tax.toFixed(2)} грн</p>
-            <p style="font-size: 18px; color: #007bff;"><strong>Всього: ${total.toFixed(2)} грн</strong></p>
-          </div>
-          <p style="margin-top: 20px; color: #666; font-size: 12px;">
-            Це автоматичний лист. Будь ласка, збережіть його для вашого обліку.
-          </p>
-        </div>
-      `;
-
-      const response = await fetch("/api/send-receipt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: email,
-          subject: `Замовлення ${orderData.orderNumber} - EpicGame Shop`,
-          html: emailHTML,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send email");
-      }
-    } catch {
-      /* email delivery is optional — silently skip */
-    } finally {
-      setIsSendingEmail(false);
-    }
-  };
-
-  /* ─── Place order ─── */
-  const handlePlaceOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!isFormValid) return;
-
-    setIsLoading(true);
-    setOrderServerSaveMessage(null);
-
-    try {
-      mergePurchasedGames(items);
-
-      const orderNo = generateOrderNumber();
-      const { grouped, flat } = generateActivationKeys(items);
-
-      setOrderNumber(orderNo);
-      setActivationKeys(flat);
-
-      const localOrder = {
-        orderNumber: orderNo,
-        email,
-        total,
-        subtotal: effectiveSubtotal,
-        tax,
-        created_at: new Date().toISOString(),
-        items: items.map((item) => ({
-          id: item.id,
-          game_title: item.title,
-          quantity: item.quantity,
-          price: getItemPrice(item) * item.quantity,
-          activation_key:
-            flat.find((k) => k.game_id === item.id)?.activation_key || "",
-        })),
-      };
-      saveOrderLocally(localOrder);
-
-      try {
-        const persistBody = buildServerOrderPayload({
-          email,
-          userId: session?.user?.id ?? null,
-          orderNumber: orderNo,
-          items,
-          flatKeys: flat,
-          subtotal: effectiveSubtotal,
-          tax,
-          total,
-        });
-
-        const persistRes = await fetch("/api/orders", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(persistBody),
-        });
-
-        if (!persistRes.ok) {
-          let detail = persistRes.statusText;
-          try {
-            const errBody = (await persistRes.json()) as { error?: string };
-            if (errBody?.error) detail = errBody.error;
-          } catch {
-            /* ignore parse error */
-          }
-          setOrderServerSaveMessage(
-            `Замовлення збережено лише на цьому пристрої. Сервер не прийняв запис (${detail}).`,
-          );
-        }
-      } catch {
-        setOrderServerSaveMessage(
-          "Замовлення збережено лише на цьому пристрої: не вдалося зв'язатися з сервером.",
-        );
-      }
-
-      setShowReceipt(true);
-      setIsLoading(false);
-
-      await sendEmailReceipt({
-        orderNumber: orderNo,
-        items: items.map((it) => ({
-          title: it.title,
-          quantity: it.quantity,
-          price: getItemPrice(it) * it.quantity,
-        })),
-        keys: grouped,
-      });
-    } catch {
-      setIsLoading(false);
-    }
-  };
-
-  /* ─── Receipt close ─── */
-  const handleReceiptClose = () => {
-    dispatch(clearCart());
-    setShowReceipt(false);
-    window.location.href = "/";
-  };
-
-  /* ─── Empty cart ─── */
-  if (items.length === 0 && !showReceipt) {
+  if (form.items.length === 0 && !form.showReceipt) {
     return (
       <div className={styles.container}>
         <div className={cStyles.emptyState}>
@@ -352,8 +45,6 @@ export default function CheckoutPage() {
     );
   }
 
-  const isSubmitting = isLoading || isSendingEmail;
-
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -364,7 +55,7 @@ export default function CheckoutPage() {
           <SecurityBadges />
 
           <form
-            onSubmit={handlePlaceOrder}
+            onSubmit={form.handlePlaceOrder}
             noValidate
             className={styles.checkoutForm}
           >
@@ -380,27 +71,27 @@ export default function CheckoutPage() {
                   type="email"
                   autoComplete="off"
                   placeholder="your@email.com"
-                  value={email}
-                  onChange={handleEmailChange}
-                  onBlur={handleEmailBlur}
-                  disabled={isSubmitting}
-                  className={`${cStyles.input} ${emailTouched && emailError ? cStyles.inputError : ""} ${emailTouched && !emailError && email ? cStyles.inputValid : ""}`}
+                  value={form.email}
+                  onChange={form.handleEmailChange}
+                  onBlur={form.handleEmailBlur}
+                  disabled={form.isSubmitting}
+                  className={`${cStyles.input} ${form.emailTouched && form.emailError ? cStyles.inputError : ""} ${form.emailTouched && !form.emailError && form.email ? cStyles.inputValid : ""}`}
                   aria-required="true"
-                  aria-invalid={emailTouched && !!emailError}
+                  aria-invalid={form.emailTouched && !!form.emailError}
                   aria-describedby={
-                    emailError ? "email-error" : "email-hint"
+                    form.emailError ? "email-error" : "email-hint"
                   }
                 />
                 <span id="email-hint" className={cStyles.fieldHint}>
                   Ключі активації будуть відправлені на цей email
                 </span>
-                {emailTouched && emailError && (
+                {form.emailTouched && form.emailError && (
                   <span
                     id="email-error"
                     className={cStyles.fieldError}
                     role="alert"
                   >
-                    {emailError}
+                    {form.emailError}
                   </span>
                 )}
               </div>
@@ -415,9 +106,9 @@ export default function CheckoutPage() {
                     type="radio"
                     name="payment_method"
                     value="card"
-                    checked={paymentMethod === "card"}
-                    onChange={() => setPaymentMethod("card")}
-                    disabled={isSubmitting}
+                    checked={form.paymentMethod === "card"}
+                    onChange={() => form.setPaymentMethod("card")}
+                    disabled={form.isSubmitting}
                   />
                   <div className={cStyles.methodContent}>
                     <span className={cStyles.methodIcon} aria-hidden="true">
@@ -439,9 +130,9 @@ export default function CheckoutPage() {
                     type="radio"
                     name="payment_method"
                     value="paypal"
-                    checked={paymentMethod === "paypal"}
-                    onChange={() => setPaymentMethod("paypal")}
-                    disabled={isSubmitting}
+                    checked={form.paymentMethod === "paypal"}
+                    onChange={() => form.setPaymentMethod("paypal")}
+                    disabled={form.isSubmitting}
                   />
                   <div className={cStyles.methodContent}>
                     <span className={cStyles.methodIcon} aria-hidden="true">
@@ -461,39 +152,38 @@ export default function CheckoutPage() {
             {/* Payment details */}
             <fieldset className={styles.fieldset}>
               <legend className={styles.legend}>
-                {paymentMethod === "card" ? "Дані картки" : "PayPal"}
+                {form.paymentMethod === "card" ? "Дані картки" : "PayPal"}
               </legend>
 
-              {paymentMethod === "card" ? (
+              {form.paymentMethod === "card" ? (
                 <CardPaymentForm
-                  disabled={isSubmitting}
-                  onChange={handleCardFormChange}
+                  disabled={form.isSubmitting}
+                  onChange={form.handleCardFormChange}
                 />
               ) : (
                 <div className={cStyles.paypalSection}>
                   <button
                     type="button"
                     className={cStyles.paypalBtn}
-                    disabled={isSubmitting}
+                    disabled={form.isSubmitting}
                   >
                     Перейти до PayPal
                   </button>
                   <p className={cStyles.paypalHint}>
-                    Ви будете перенаправлені на сайт PayPal для завершення
-                    оплати
+                    Ви будете перенаправлені на сайт PayPal для завершення оплати
                   </p>
                 </div>
               )}
             </fieldset>
 
-            {/* Promo code (mobile — inside form) */}
+            {/* Promo code (mobile) */}
             <div className={styles.promoMobile}>
               <PromoCode
-                onApply={handlePromoApply}
-                onRemove={handlePromoRemove}
-                appliedCode={promoCode}
-                discount={promoDiscount}
-                disabled={isSubmitting}
+                onApply={form.handlePromoApply}
+                onRemove={form.handlePromoRemove}
+                appliedCode={form.promoCode}
+                discount={form.promoDiscount}
+                disabled={form.isSubmitting}
               />
             </div>
 
@@ -502,9 +192,9 @@ export default function CheckoutPage() {
               <label className={cStyles.checkboxLabel}>
                 <input
                   type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  disabled={isSubmitting}
+                  checked={form.termsAccepted}
+                  onChange={(e) => form.setTermsAccepted(e.target.checked)}
+                  disabled={form.isSubmitting}
                   aria-required="true"
                 />
                 <span>
@@ -512,24 +202,24 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     className={cStyles.termsLink}
-                    onClick={() => setShowTermsModal(true)}
+                    onClick={() => form.setShowTermsModal(true)}
                   >
                     умовами покупки
                   </button>
                 </span>
               </label>
 
-              {session?.user && (
+              {form.session?.user && (
                 <label className={cStyles.checkboxLabel}>
                   <input
                     type="checkbox"
-                    checked={savePaymentData}
-                    onChange={(e) => setSavePaymentData(e.target.checked)}
-                    disabled={isSubmitting}
+                    checked={form.savePaymentData}
+                    onChange={(e) =>
+                      form.setSavePaymentData(e.target.checked)
+                    }
+                    disabled={form.isSubmitting}
                   />
-                  <span>
-                    Зберегти платіжні дані для наступних покупок
-                  </span>
+                  <span>Зберегти платіжні дані для наступних покупок</span>
                 </label>
               )}
             </div>
@@ -539,15 +229,15 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 className={cStyles.placeButton}
-                disabled={!isFormValid || isSubmitting}
+                disabled={!form.isFormValid || form.isSubmitting}
               >
-                {isSubmitting ? (
+                {form.isSubmitting ? (
                   <>
                     <span className={cStyles.spinner} aria-hidden="true" />
                     Обробка...
                   </>
                 ) : (
-                  `Сплатити ${formatPrice(total)}`
+                  `Сплатити ${form.formatPrice(form.total)}`
                 )}
               </button>
 
@@ -561,27 +251,27 @@ export default function CheckoutPage() {
         {/* ─── RIGHT: Order summary ─── */}
         <div className={styles.summaryWrapper}>
           <OrderSummary
-            items={items}
-            subtotal={subtotal}
-            tax={tax}
-            total={total}
-            promoDiscount={promoDiscount}
+            items={form.items}
+            subtotal={form.subtotal}
+            tax={form.tax}
+            total={form.total}
+            promoDiscount={form.promoDiscount}
           />
 
           <div className={styles.promoDesktop}>
             <PromoCode
-              onApply={handlePromoApply}
-              onRemove={handlePromoRemove}
-              appliedCode={promoCode}
-              discount={promoDiscount}
-              disabled={isSubmitting}
+              onApply={form.handlePromoApply}
+              onRemove={form.handlePromoRemove}
+              appliedCode={form.promoCode}
+              discount={form.promoDiscount}
+              disabled={form.isSubmitting}
             />
           </div>
         </div>
       </div>
 
-      {/* ─── Loading overlay ─── */}
-      {isLoading && (
+      {/* Loading overlay */}
+      {form.isLoading && (
         <div className={cStyles.loaderOverlay} aria-live="assertive">
           <div className={cStyles.loaderContent}>
             <div className={cStyles.loaderRing} />
@@ -590,22 +280,22 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      {/* ─── Terms modal ─── */}
+      {/* Terms modal */}
       <TermsModal
-        isOpen={showTermsModal}
-        onClose={() => setShowTermsModal(false)}
+        isOpen={form.showTermsModal}
+        onClose={() => form.setShowTermsModal(false)}
       />
 
-      {/* ─── Receipt modal ─── */}
-      {showReceipt && (
+      {/* Receipt modal */}
+      {form.showReceipt && (
         <ReceiptModal
-          orderNumber={orderNumber}
-          email={email}
-          items={items}
-          activationKeys={activationKeys}
-          total={total}
-          serverSaveMessage={orderServerSaveMessage}
-          onClose={handleReceiptClose}
+          orderNumber={form.orderNumber}
+          email={form.email}
+          items={form.items}
+          activationKeys={form.activationKeys}
+          total={form.total}
+          serverSaveMessage={form.orderServerSaveMessage}
+          onClose={form.handleReceiptClose}
         />
       )}
     </div>

@@ -8,6 +8,8 @@ export const metadata: Metadata = {
     "Переглядайте, фільтруйте та знаходьте ідеальну гру. Знижки, безкоштовні ігри, МЕГА АКЦІЇ та ексклюзиви.",
 };
 
+export const revalidate = 300;
+
 export default async function DiscoverPage() {
   const games = await loadCatalogGames();
 

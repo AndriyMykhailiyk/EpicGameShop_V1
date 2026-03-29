@@ -1,32 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import GameImage from "@/components/ui/GameImage";
-import { getSaleGames } from "@/lib/api/game";
+import type { Game } from "@/types/game";
 import styles from "./GamesPage.module.css";
 
-interface Game {
-  price: any;
-  image: any;
-  id: string;
-  title: string;
-  originalPrice: string;
-  discountedPrice: string;
-  discount?: number;
-  imageUrl: string;
-  tags: string[];
-  developer?: string;
-  publisher?: string;
-  rating?: string;
-  isEarlyAccess?: boolean;
-  isFree?: boolean;
-  platforms: string[];
-  releaseDate?: string;
-  description?: string;
-  isMegaSale?: boolean;
-  saleEndsAt?: string;
-}
+const ITEMS_PER_PAGE = 20;
 
 const PRICE_FILTERS = [
   { label: "До 100 ₴", max: 100 },
@@ -36,22 +16,20 @@ const PRICE_FILTERS = [
 
 export default function GamesPage() {
   const [games, setGames] = useState<Game[]>([]);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         const res = await fetch("/api/games/catalog");
-        if (!res.ok) {
-          throw new Error("catalog");
-        }
+        if (!res.ok) throw new Error("catalog");
         const data = await res.json();
-        if (!cancelled) {
-          setGames((data.games ?? []) as Game[]);
-        }
+        if (!cancelled) setGames(data.games ?? []);
       } catch {
         if (!cancelled) {
-          setGames(getSaleGames() as Game[]);
+          const { getSaleGames } = await import("@/lib/api/game");
+          setGames(getSaleGames());
         }
       }
     })();
@@ -60,34 +38,46 @@ export default function GamesPage() {
     };
   }, []);
 
-  const allPlatforms = Array.from(
-    new Set(games.flatMap((g) => g.platforms || []))
+  const allPlatforms = useMemo(
+    () => Array.from(new Set(games.flatMap((g) => g.platforms || []))),
+    [games],
   );
 
-  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [priceMax, setPriceMax] = useState<number | null>(null);
 
   const filteredGames = useMemo(() => {
     return games.filter((game) => {
-      const byPlatform = selectedPlatform
-        ? game.platforms?.includes(selectedPlatform)
-        : true;
-
-      const byPrice = priceMax
-        ? (game.price?.current || 0) <= priceMax
-        : true;
-
-      return byPlatform && byPrice;
+      if (selectedPlatform && !game.platforms?.includes(selectedPlatform)) {
+        return false;
+      }
+      if (priceMax) {
+        const cleaned = game.discountedPrice
+          ?.replace(/[^\d.,]/g, "")
+          .replace(/,/g, ".");
+        const price = parseFloat(cleaned || "0") || 0;
+        if (price > priceMax) return false;
+      }
+      return true;
     });
-  }, [games, selectedGenre, selectedPlatform, priceMax]);
+  }, [games, selectedPlatform, priceMax]);
+
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [selectedPlatform, priceMax]);
+
+  const handleShowMore = useCallback(() => {
+    setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
+  }, []);
+
+  const visibleGames = filteredGames.slice(0, visibleCount);
 
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Увесь асортимент</h1>
 
       <div className={styles.grid}>
-        {filteredGames.map((game) => (
+        {visibleGames.map((game) => (
           <div key={game.id} className={styles.card}>
             <Link href={`/store/p/${game.id}`} className={styles.cardLink}>
               {game.imageUrl && (
@@ -115,6 +105,28 @@ export default function GamesPage() {
           </div>
         ))}
       </div>
+
+      {visibleCount < filteredGames.length && (
+        <div style={{ display: "flex", justifyContent: "center", margin: "2rem 0" }}>
+          <button
+            onClick={handleShowMore}
+            style={{
+              padding: "0.75rem 2.5rem",
+              background: "#3b82f6",
+              color: "#fff",
+              border: "none",
+              borderRadius: "0.5rem",
+              fontWeight: 600,
+              fontSize: "0.9375rem",
+              cursor: "pointer",
+              minHeight: "44px",
+              transition: "background 0.2s",
+            }}
+          >
+            Показати ще ({filteredGames.length - visibleCount} залишилось)
+          </button>
+        </div>
+      )}
     </div>
   );
 }

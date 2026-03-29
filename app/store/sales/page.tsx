@@ -4,6 +4,8 @@ import FilterSidebar from "@/components/ui/filters/FilterSidebar";
 import WeeklyOffer from "@/components/ui/sections/WeeklyOffer";
 import { loadCatalogGames } from "@/lib/catalog/loadGames";
 
+export const revalidate = 300;
+
 export default async function SalesPage() {
   const games = await loadCatalogGames();
 
