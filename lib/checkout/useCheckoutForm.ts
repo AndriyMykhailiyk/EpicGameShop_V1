@@ -283,7 +283,8 @@ export function useCheckoutForm() {
 
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({}));
-        throw new Error((errBody as { error?: string }).error || "Помилка створення платежу");
+        const detail = (errBody as { error?: string }).error || res.statusText;
+        throw new Error(detail);
       }
 
       const result = (await res.json()) as {
@@ -297,9 +298,10 @@ export function useCheckoutForm() {
       setOrderNumber(result.orderNumber);
       setLiqpayData(result.data);
       setLiqpaySignature(result.signature);
-    } catch {
+    } catch (err) {
       setIsLoading(false);
-      setOrderServerSaveMessage("Не вдалося створити платіж LiqPay. Спробуйте ще раз.");
+      const msg = err instanceof Error ? err.message : "Невідома помилка";
+      setOrderServerSaveMessage(`Не вдалося створити платіж LiqPay: ${msg}`);
     }
   };
 
