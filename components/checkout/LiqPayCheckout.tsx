@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { LIQPAY_CHECKOUT_URL } from "@/lib/payment/liqpay";
+import { LIQPAY_CHECKOUT_URL } from "@/lib/payment/liqpayConstants";
 
 interface LiqPayCheckoutProps {
   data: string;

@@ -93,9 +93,11 @@ export async function POST(request: Request) {
       logger.error("LiqPay order insert failed", {
         message: orderError?.message,
         code: orderError?.code,
+        details: orderError?.details,
+        hint: orderError?.hint,
       });
       return NextResponse.json(
-        { error: "Не вдалося створити замовлення" },
+        { error: `Не вдалося створити замовлення: ${orderError?.message || "unknown"}` },
         { status: 500 },
       );
     }
@@ -120,10 +122,11 @@ export async function POST(request: Request) {
     if (itemsError) {
       logger.error("LiqPay order items insert failed", {
         message: itemsError.message,
+        code: itemsError.code,
       });
       await supabaseAdmin.from("orders").delete().eq("id", order.id);
       return NextResponse.json(
-        { error: "Не вдалося зберегти товари замовлення" },
+        { error: `Не вдалося зберегти товари: ${itemsError.message}` },
         { status: 500 },
       );
     }
@@ -161,11 +164,14 @@ export async function POST(request: Request) {
       orderId: order.id,
     });
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    const stack = err instanceof Error ? err.stack : undefined;
     logger.error("POST /api/payment/liqpay/create failed", {
-      error: err instanceof Error ? err.message : String(err),
+      error: message,
+      stack,
     });
     return NextResponse.json(
-      { error: "Помилка сервера" },
+      { error: message || "Помилка сервера" },
       { status: 500 },
     );
   }
