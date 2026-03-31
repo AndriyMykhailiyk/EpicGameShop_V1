@@ -18,7 +18,7 @@ import {
 import { buildReceiptEmailHtml } from "@/lib/checkout/emailTemplate";
 import type { CardFormData } from "@/components/checkout/CardPaymentForm";
 
-type PaymentMethod = "card" | "paypal";
+type PaymentMethod = "card" | "paypal" | "liqpay";
 
 /**
  * Encapsulates all checkout form logic: email validation, promo codes,
@@ -52,6 +52,9 @@ export function useCheckoutForm() {
     string | null
   >(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
+
+  const [liqpayData, setLiqpayData] = useState<string | null>(null);
+  const [liqpaySignature, setLiqpaySignature] = useState<string | null>(null);
 
   /* ─── Price calculations ─── */
   const subtotal = useMemo(
@@ -127,7 +130,10 @@ export function useCheckoutForm() {
   /* ─── Form validity ─── */
   const isFormValid = useMemo(() => {
     const emailOk = validateEmail(email).isValid;
-    const paymentOk = paymentMethod === "paypal" || cardFormValid;
+    const paymentOk =
+      paymentMethod === "paypal" ||
+      paymentMethod === "liqpay" ||
+      cardFormValid;
     return emailOk && paymentOk && termsAccepted && items.length > 0;
   }, [email, paymentMethod, cardFormValid, termsAccepted, items.length]);
 
@@ -166,11 +172,8 @@ export function useCheckoutForm() {
     }
   };
 
-  /* ─── Place order ─── */
-  const handlePlaceOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isFormValid) return;
-
+  /* ─── Place order (card / PayPal — existing flow) ─── */
+  const handlePlaceOrderClassic = async () => {
     setIsLoading(true);
     setOrderServerSaveMessage(null);
 
@@ -252,6 +255,66 @@ export function useCheckoutForm() {
     }
   };
 
+  /* ─── Place order (LiqPay — real payment via PrivatBank) ─── */
+  const handlePlaceOrderLiqPay = async () => {
+    setIsLoading(true);
+    setOrderServerSaveMessage(null);
+
+    try {
+      const payload = {
+        email,
+        items: items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          quantity: item.quantity,
+          unitPrice: getItemPrice(item),
+          lineTotal: getItemPrice(item) * item.quantity,
+        })),
+        subtotal: effectiveSubtotal,
+        tax,
+        total,
+      };
+
+      const res = await fetch("/api/payment/liqpay/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error((errBody as { error?: string }).error || "Помилка створення платежу");
+      }
+
+      const result = (await res.json()) as {
+        data: string;
+        signature: string;
+        orderNumber: string;
+        orderId: string;
+      };
+
+      mergePurchasedGames(items);
+      setOrderNumber(result.orderNumber);
+      setLiqpayData(result.data);
+      setLiqpaySignature(result.signature);
+    } catch {
+      setIsLoading(false);
+      setOrderServerSaveMessage("Не вдалося створити платіж LiqPay. Спробуйте ще раз.");
+    }
+  };
+
+  /* ─── Place order (router) ─── */
+  const handlePlaceOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isFormValid) return;
+
+    if (paymentMethod === "liqpay") {
+      await handlePlaceOrderLiqPay();
+    } else {
+      await handlePlaceOrderClassic();
+    }
+  };
+
   /* ─── Receipt close ─── */
   const handleReceiptClose = () => {
     dispatch(clearCart());
@@ -294,5 +357,7 @@ export function useCheckoutForm() {
     formatPrice,
     handlePlaceOrder,
     handleReceiptClose,
+    liqpayData,
+    liqpaySignature,
   };
 }

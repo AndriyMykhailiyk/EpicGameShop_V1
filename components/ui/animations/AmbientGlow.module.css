@@ -1,0 +1,62 @@
+.container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.07;
+  will-change: transform;
+}
+
+.orbPrimary {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #3b82f6, transparent 70%);
+  top: -10%;
+  right: -5%;
+}
+
+.orbSecondary {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #8b5cf6, transparent 70%);
+  bottom: 10%;
+  left: -5%;
+}
+
+.orbAccent {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, #06b6d4, transparent 70%);
+  top: 40%;
+  left: 30%;
+}
+
+@media (max-width: 768px) {
+  .orbPrimary {
+    width: 300px;
+    height: 300px;
+  }
+
+  .orbSecondary {
+    width: 250px;
+    height: 250px;
+  }
+
+  .orbAccent {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    display: none;
+  }
+}
