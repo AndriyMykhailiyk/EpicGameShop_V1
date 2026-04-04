@@ -10,12 +10,51 @@ import OrderSummary from "@/components/checkout/OrderSummary";
 import PromoCode from "@/components/checkout/PromoCode";
 import ReceiptModal from "@/components/checkout/ReceiptModal";
 import TermsModal from "@/components/checkout/TermsModal";
+import LiqPayCheckout from "@/components/checkout/LiqPayCheckout";
 
 import styles from "./page.module.css";
 import cStyles from "@/components/checkout/checkout.module.css";
 
 export default function CheckoutPage() {
   const form = useCheckoutForm();
+
+  if (form.sessionStatus === "loading") {
+    return (
+      <div className={styles.container}>
+        <div className={cStyles.emptyState}>
+          <div className={cStyles.loaderRing} />
+          <p className={cStyles.emptyText}>Завантаження...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (form.sessionStatus === "unauthenticated" || !form.session) {
+    return (
+      <div className={styles.container}>
+        <div className={cStyles.emptyState}>
+          <svg
+            className={cStyles.emptyIcon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            aria-hidden="true"
+          >
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+          <h2 className={cStyles.emptyTitle}>Увійдіть в акаунт</h2>
+          <p className={cStyles.emptyText}>
+            Для оформлення замовлення потрібно авторизуватися.
+          </p>
+          <Link href="/account" className={cStyles.emptyLink}>
+            Увійти в акаунт
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (form.items.length === 0 && !form.showReceipt) {
     return (
@@ -129,6 +168,30 @@ export default function CheckoutPage() {
                   <input
                     type="radio"
                     name="payment_method"
+                    value="liqpay"
+                    checked={form.paymentMethod === "liqpay"}
+                    onChange={() => form.setPaymentMethod("liqpay")}
+                    disabled={form.isSubmitting}
+                  />
+                  <div className={cStyles.methodContent}>
+                    <span className={cStyles.methodIcon} aria-hidden="true">
+                      🏦
+                    </span>
+                    <div className={cStyles.methodInfo}>
+                      <span className={cStyles.methodTitle}>
+                        ПриватБанк / LiqPay
+                      </span>
+                      <span className={cStyles.methodDesc}>
+                        Оплата карткою через LiqPay (ПриватБанк)
+                      </span>
+                    </div>
+                  </div>
+                </label>
+
+                <label className={cStyles.methodOption}>
+                  <input
+                    type="radio"
+                    name="payment_method"
                     value="paypal"
                     checked={form.paymentMethod === "paypal"}
                     onChange={() => form.setPaymentMethod("paypal")}
@@ -150,17 +213,39 @@ export default function CheckoutPage() {
             </fieldset>
 
             {/* Payment details */}
-            <fieldset className={styles.fieldset}>
-              <legend className={styles.legend}>
-                {form.paymentMethod === "card" ? "Дані картки" : "PayPal"}
-              </legend>
-
-              {form.paymentMethod === "card" ? (
+            {form.paymentMethod === "card" && (
+              <fieldset className={styles.fieldset}>
+                <legend className={styles.legend}>Дані картки</legend>
                 <CardPaymentForm
                   disabled={form.isSubmitting}
                   onChange={form.handleCardFormChange}
                 />
-              ) : (
+              </fieldset>
+            )}
+
+            {form.paymentMethod === "liqpay" && (
+              <fieldset className={styles.fieldset}>
+                <legend className={styles.legend}>LiqPay (ПриватБанк)</legend>
+                <div className={cStyles.liqpaySection}>
+                  <div className={cStyles.liqpayInfo}>
+                    <span className={cStyles.liqpayIcon} aria-hidden="true">🔒</span>
+                    <div>
+                      <p className={cStyles.liqpayText}>
+                        Після натискання &quot;Сплатити&quot; ви будете перенаправлені
+                        на захищену сторінку LiqPay для введення даних картки.
+                      </p>
+                      <p className={cStyles.liqpayHint}>
+                        Підтримуються: Visa, Mastercard, ПриватБанк
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            )}
+
+            {form.paymentMethod === "paypal" && (
+              <fieldset className={styles.fieldset}>
+                <legend className={styles.legend}>PayPal</legend>
                 <div className={cStyles.paypalSection}>
                   <button
                     type="button"
@@ -173,8 +258,8 @@ export default function CheckoutPage() {
                     Ви будете перенаправлені на сайт PayPal для завершення оплати
                   </p>
                 </div>
-              )}
-            </fieldset>
+              </fieldset>
+            )}
 
             {/* Promo code (mobile) */}
             <div className={styles.promoMobile}>
@@ -269,6 +354,21 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* LiqPay redirect form (auto-submits when data is ready) */}
+      {form.liqpayData && form.liqpaySignature && (
+        <LiqPayCheckout
+          data={form.liqpayData}
+          signature={form.liqpaySignature}
+        />
+      )}
+
+      {/* Server error message */}
+      {form.orderServerSaveMessage && !form.showReceipt && (
+        <div className={cStyles.serverError} role="alert">
+          {form.orderServerSaveMessage}
+        </div>
+      )}
 
       {/* Loading overlay */}
       {form.isLoading && (

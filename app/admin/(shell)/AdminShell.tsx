@@ -11,6 +11,7 @@ const links = [
   { href: "/admin/games", label: "Ігри" },
   { href: "/admin/users", label: "Користувачі" },
   { href: "/admin/orders", label: "Замовлення" },
+  { href: "/admin/refunds", label: "Повернення" },
   { href: "/admin/analytics", label: "Аналітика" },
 ];
 

@@ -12,6 +12,13 @@ let cachedGames: Game[] | null = null;
 let cacheTimestamp = 0;
 let cachePromise: Promise<Game[]> | null = null;
 
+/** Invalidates the in-memory catalog cache so the next call re-fetches. */
+export function invalidateCatalogCache(): void {
+  cachedGames = null;
+  cacheTimestamp = 0;
+  cachePromise = null;
+}
+
 /**
  * Loads the storefront catalog combining three sources with an in-memory
  * cache that revalidates every 5 minutes.

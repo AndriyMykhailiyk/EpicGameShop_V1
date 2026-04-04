@@ -1,14 +1,25 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/auth";
 import { logger } from "@/lib/logger";
 import { normalizeOrderUserId } from "@/lib/orders/normalizeOrderUserId";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { createOrderSchema } from "@/lib/validation/adminSchemas";
 
 /**
- * POST /api/orders — persists a completed checkout (public; validated body).
+ * POST /api/orders — persists a completed checkout.
+ * Requires an authenticated session (NextAuth).
  */
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
     const json = await request.json();
     const parsed = createOrderSchema.safeParse(json);
     if (!parsed.success) {

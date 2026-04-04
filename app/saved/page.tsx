@@ -68,11 +68,15 @@ export default function SavedGamesPage() {
                 <h3>{game.title}</h3>
                 <div className={styles.price}>
                   <span className={styles.currentPrice}>
-                    ${game.price.current}
+                    {typeof game.price.current === "number"
+                      ? `${game.price.current.toFixed(2)} грн`
+                      : `${game.price.current} грн`}
                   </span>
                   {game.price.original && (
                     <span className={styles.originalPrice}>
-                      ${game.price.original}
+                      {typeof game.price.original === "number"
+                        ? `${game.price.original.toFixed(2)} грн`
+                        : `${game.price.original} грн`}
                     </span>
                   )}
                 </div>

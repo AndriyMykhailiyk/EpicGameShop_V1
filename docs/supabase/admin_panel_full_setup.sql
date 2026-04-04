@@ -41,10 +41,14 @@ CREATE TABLE IF NOT EXISTS public.orders (
   order_number TEXT NOT NULL UNIQUE,
   user_id UUID REFERENCES public.users (id) ON DELETE SET NULL,
   email TEXT NOT NULL,
-  status TEXT NOT NULL CHECK (status IN ('paid', 'pending')) DEFAULT 'paid',
+  status TEXT NOT NULL CHECK (status IN ('paid', 'pending', 'cancelled')) DEFAULT 'paid',
   subtotal NUMERIC(12, 2) NOT NULL,
   tax NUMERIC(12, 2) NOT NULL,
   total NUMERIC(12, 2) NOT NULL,
+  payment_method TEXT DEFAULT 'card',
+  liqpay_status TEXT,
+  liqpay_payment_id TEXT,
+  paid_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -52,6 +56,8 @@ CREATE INDEX IF NOT EXISTS idx_orders_created_at ON public.orders (created_at DE
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON public.orders (user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_email ON public.orders (email);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders (status);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_method ON public.orders (payment_method);
+CREATE INDEX IF NOT EXISTS idx_orders_liqpay_status ON public.orders (liqpay_status) WHERE liqpay_status IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS public.order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

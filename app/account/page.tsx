@@ -267,7 +267,8 @@ export default function AccountPage() {
         {isLogin && (
           <div className={styles.footer}>
             <p>
-              Забули пароль? <a href="#">Відновити</a>
+              Забули пароль?{" "}
+              <Link href="/account/forgot-password">Відновити</Link>
             </p>
           </div>
         )}

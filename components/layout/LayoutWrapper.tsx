@@ -5,6 +5,8 @@ import { useState, useCallback, useEffect } from "react";
 import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
+import { AnimatedMain, AmbientGlow } from "@/components/ui/animations";
+import FeedbackWidget from "@/components/ui/FeedbackWidget/FeedbackWidget";
 
 export default function LayoutWrapper({
   children,
@@ -50,12 +52,17 @@ export default function LayoutWrapper({
   }
 
   if (isMinimalLayout) {
-    return <main className="main-content">{children}</main>;
+    return (
+      <AnimatedMain className="main-content">
+        {children}
+      </AnimatedMain>
+    );
   }
 
   return (
     <div className="site-wrapper">
-      {/* Mobile overlay */}
+      <AmbientGlow />
+
       <div
         className={`sidebar-overlay ${sidebarOpen ? "active" : ""}`}
         onClick={closeSidebar}
@@ -69,13 +76,14 @@ export default function LayoutWrapper({
 
         <div className="main-column">
           <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-          <main className="main-content">
+          <AnimatedMain className="main-content">
             {children}
-          </main>
+          </AnimatedMain>
         </div>
       </div>
 
       <Footer />
+      <FeedbackWidget />
     </div>
   );
 }

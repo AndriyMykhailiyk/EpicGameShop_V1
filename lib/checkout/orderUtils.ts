@@ -140,6 +140,33 @@ export function buildServerOrderPayload(params: {
   tax: number;
   total: number;
 }): Record<string, unknown> {
+  const unitItems: {
+    gameId: string;
+    gameTitle: string;
+    quantity: number;
+    unitPrice: number;
+    lineTotal: number;
+    activationKey: string;
+  }[] = [];
+
+  for (const item of params.items) {
+    const price = getItemPrice(item);
+    const keysForGame = params.flatKeys.filter(
+      (k) => k.game_id === item.id,
+    );
+
+    for (let i = 0; i < item.quantity; i++) {
+      unitItems.push({
+        gameId: item.id,
+        gameTitle: item.title,
+        quantity: 1,
+        unitPrice: price,
+        lineTotal: price,
+        activationKey: keysForGame[i]?.activation_key ?? "",
+      });
+    }
+  }
+
   return {
     email: params.email,
     userId: params.userId,
@@ -148,18 +175,6 @@ export function buildServerOrderPayload(params: {
     tax: params.tax,
     total: params.total,
     orderNumber: params.orderNumber,
-    items: params.items.map((item) => {
-      const keysForGame = params.flatKeys.filter(
-        (k) => k.game_id === item.id,
-      );
-      return {
-        gameId: item.id,
-        gameTitle: item.title,
-        quantity: item.quantity,
-        unitPrice: getItemPrice(item),
-        lineTotal: getItemPrice(item) * item.quantity,
-        activationKey: keysForGame[0]?.activation_key,
-      };
-    }),
+    items: unitItems,
   };
 }
