@@ -1,0 +1,325 @@
+/* ─── Floating feedback button ─── */
+.floatingBtn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 1050;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  transition: transform 0.3s, box-shadow 0.3s;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.floatingBtn:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 6px 28px rgba(99, 102, 241, 0.5);
+  animation: none;
+}
+
+.floatingBtn:active {
+  transform: scale(0.95);
+}
+
+.floatingBtn svg {
+  width: 26px;
+  height: 26px;
+  fill: currentColor;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 28px rgba(99, 102, 241, 0.6);
+  }
+}
+
+/* ─── Modal overlay ─── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Modal container ─── */
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 30, 60, 0.95) 0%,
+    rgba(20, 40, 80, 0.95) 100%
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.closeBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  font-size: 1.125rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+/* ─── Modal header ─── */
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  background: linear-gradient(135deg, #3b82f6, #818cf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.modalSubtitle {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  margin: 0 0 1.5rem;
+}
+
+/* ─── Form ─── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input,
+.select,
+.textarea {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 0.625rem;
+  background: rgba(15, 30, 60, 0.6);
+  color: #fff;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: #64748b;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.select option {
+  background: #1e293b;
+  color: #fff;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.fieldError {
+  font-size: 0.75rem;
+  color: #f87171;
+  margin: 0;
+}
+
+/* ─── Row layout for name + type ─── */
+.row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 400px) {
+  .row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ─── Submit button ─── */
+.submitBtn {
+  padding: 0.75rem 1.5rem;
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 0.625rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #818cf8 100%);
+  background-size: 200% 200%;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: background-position 0.4s, box-shadow 0.3s, transform 0.2s;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  min-height: 44px;
+}
+
+.submitBtn:hover {
+  background-position: 100% 0;
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.45);
+  transform: translateY(-1px);
+}
+
+.submitBtn:active {
+  transform: translateY(0);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Success / error messages ─── */
+.successMsg {
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.successIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.successMsg h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #4ade80;
+  margin: 0 0 0.5rem;
+}
+
+.successMsg p {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  margin: 0 0 1.25rem;
+}
+
+.closeAfterSuccess {
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.5rem;
+  color: #cbd5e1;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  min-height: 40px;
+}
+
+.closeAfterSuccess:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.errorMsg {
+  padding: 0.75rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.5rem;
+  color: #fca5a5;
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
+/* ─── Mobile adjustments ─── */
+@media (max-width: 480px) {
+  .modal {
+    padding: 1.5rem;
+    border-radius: 1rem;
+  }
+
+  .floatingBtn {
+    width: 50px;
+    height: 50px;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .floatingBtn svg {
+    width: 22px;
+    height: 22px;
+  }
+}

@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header/Header";
 import Footer from "@/components/layout/Footer/Footer";
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import { AnimatedMain, AmbientGlow } from "@/components/ui/animations";
+import FeedbackWidget from "@/components/ui/FeedbackWidget/FeedbackWidget";
 
 export default function LayoutWrapper({
   children,
@@ -82,6 +83,7 @@ export default function LayoutWrapper({
       </div>
 
       <Footer />
+      <FeedbackWidget />
     </div>
   );
 }

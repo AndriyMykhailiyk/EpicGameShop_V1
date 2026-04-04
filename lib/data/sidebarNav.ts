@@ -24,5 +24,12 @@ export const sidebarNavItems: SidebarNavItem[] = [
     href: "/orders",
     requiresAuth: true,
   },
+  {
+    id: "refunds",
+    label: "Повернення",
+    icon: "↩️",
+    href: "/refunds",
+    requiresAuth: true,
+  },
   { id: "news", label: "Новини", icon: "📰", href: "/news" },
 ];

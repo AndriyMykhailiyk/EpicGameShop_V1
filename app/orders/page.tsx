@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import styles from "./orders.module.css";
 
 type OrderItem = {
@@ -12,11 +13,13 @@ type OrderItem = {
 };
 
 type Order = {
+  id?: string;
   orderNumber: string;
   email: string;
   total: number;
   subtotal: number;
   tax: number;
+  status?: string;
   created_at: string;
   items: OrderItem[];
 };
@@ -26,11 +29,9 @@ export default function OrdersPage() {
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   useEffect(() => {
-    // Завантажити замовлення з localStorage
     const savedOrders = localStorage.getItem("userOrders");
     if (savedOrders) {
       const parsed = JSON.parse(savedOrders);
-      // Сортуємо від найновіших до найстаріших
       const sorted = parsed.sort(
         (a: Order, b: Order) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -54,6 +55,10 @@ export default function OrdersPage() {
     });
   };
 
+  const isPaid = (order: Order) => {
+    return !order.status || order.status === "paid";
+  };
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Мої замовлення</h1>
@@ -69,9 +74,11 @@ export default function OrdersPage() {
         <div className={styles.ordersList}>
           {orders.map((order) => (
             <div key={order.orderNumber} className={styles.orderCard}>
-              <div
+              <button
+                type="button"
                 className={styles.orderHeader}
                 onClick={() => toggleOrder(order.orderNumber)}
+                aria-expanded={expandedOrder === order.orderNumber}
               >
                 <div className={styles.orderHeaderLeft}>
                   <h3 className={styles.orderNumber}>{order.orderNumber}</h3>
@@ -83,11 +90,11 @@ export default function OrdersPage() {
                   <p className={styles.orderTotal}>
                     {order.total.toFixed(2)} грн
                   </p>
-                  <button className={styles.expandButton}>
+                  <span className={styles.expandButton} aria-hidden="true">
                     {expandedOrder === order.orderNumber ? "▲" : "▼"}
-                  </button>
+                  </span>
                 </div>
-              </div>
+              </button>
 
               {expandedOrder === order.orderNumber && (
                 <div className={styles.orderDetails}>
@@ -137,6 +144,17 @@ export default function OrdersPage() {
                       <strong>{order.total.toFixed(2)} грн</strong>
                     </div>
                   </div>
+
+                  {isPaid(order) && (
+                    <div className={styles.refundLinkWrap}>
+                      <Link
+                        href={`/refunds?orderNumber=${encodeURIComponent(order.orderNumber)}`}
+                        className={styles.refundLink}
+                      >
+                        ↩ Запросити повернення коштів
+                      </Link>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
