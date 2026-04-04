@@ -21,7 +21,7 @@ export const feedbackSchema = z.object({
     .optional()
     .or(z.literal("")),
   type: z.enum(feedbackTypes, {
-    required_error: "Оберіть тип повідомлення",
+    message: "Оберіть тип повідомлення",
   }),
   message: z
     .string()
