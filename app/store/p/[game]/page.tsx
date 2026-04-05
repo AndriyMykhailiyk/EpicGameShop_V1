@@ -6,12 +6,14 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Game } from "@/types/game";
 import { addToCart } from "@/lib/store/cartSlice";
 import { showToast } from "@/components/ui/Toast";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import dynamic from "next/dynamic";
+import { useRecentlyViewed } from "@/lib/hooks/useRecentlyViewed";
+import RecentlyViewed from "@/components/ui/RecentlyViewed/RecentlyViewed";
 
 const System_requirements = dynamic(
   () => import("@/components/ui/cards/Systemrequirements"),
@@ -34,6 +36,23 @@ export default function GamePage() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [game, setGame] = useState<Game | null | undefined>(undefined);
+
+  const recentGameData = useMemo(
+    () =>
+      game
+        ? {
+            id: game.id,
+            title: game.title,
+            imageUrl: game.imageUrl,
+            originalPrice: game.originalPrice,
+            discountedPrice: game.discountedPrice,
+            discount: game.discount,
+          }
+        : null,
+    [game?.id, game?.title, game?.imageUrl, game?.originalPrice, game?.discountedPrice, game?.discount],
+  );
+
+  const recentlyViewed = useRecentlyViewed(gameId, recentGameData);
 
   useEffect(() => {
     if (!gameId) return;
@@ -308,6 +327,9 @@ export default function GamePage() {
 
       {/* System requirements */}
       <System_requirements />
+
+      {/* Recently viewed games */}
+      <RecentlyViewed games={recentlyViewed} />
     </div>
   );
 }

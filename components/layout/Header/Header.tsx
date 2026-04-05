@@ -54,6 +54,9 @@ export default function Header({ onToggleSidebar, sidebarOpen }: HeaderProps) {
               <li>
                 <Link href="/games">Увесь асортимент</Link>
               </li>
+              <li>
+                <Link href="/news">Новини</Link>
+              </li>
             </ul>
           </div>
         </div>
